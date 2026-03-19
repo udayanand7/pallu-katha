@@ -520,6 +520,36 @@
       background: none; border: none; color: var(--text-muted);
       font-size: 12px; cursor: pointer; font-family: inherit;
     }
+
+    /* ─── PHONE PREFIX ─── */
+    .phone-wrap { display: flex; align-items: center; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); background: white; transition: border-color 0.15s, box-shadow 0.15s; overflow: hidden; }
+    .phone-wrap:focus-within { border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(58,173,84,0.12); }
+    .phone-prefix { padding: 12px 10px 12px 14px; font-size: 15px; font-weight: 700; color: var(--text-soft); background: var(--gray-50); border-right: 1.5px solid var(--gray-200); white-space: nowrap; font-family: 'Nunito', sans-serif; }
+    .phone-wrap input { border: none !important; border-radius: 0 !important; box-shadow: none !important; padding-left: 10px !important; flex: 1; outline: none; background:white; font-size:15px; font-family:'Noto Sans',sans-serif; color:var(--text); padding-top:12px; padding-bottom:12px; }
+
+    /* ─── REMEMBER ME ─── */
+    .remember-row { display: flex; align-items: center; gap: 8px; margin: 10px 0 14px; }
+    .remember-row input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--green-700); cursor: pointer; flex-shrink:0; }
+    .remember-row label { font-size: 13px; color: var(--text-soft); cursor: pointer; font-weight: 600; }
+
+    /* ─── PAID / UNPAID ─── */
+    .paid-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; font-family: 'Nunito', sans-serif; }
+    .paid-badge.paid { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .paid-badge.unpaid { background: #fde8e8; color: #c0392b; border: 1px solid #f5c6cb; }
+    .paid-section { background: white; border: 1.5px solid var(--gray-200); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; box-shadow: var(--shadow-sm); }
+    .paid-section .ps-title { font-size: 13px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-family: 'Nunito', sans-serif; }
+    .month-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--gray-100); gap:8px; }
+    .month-row:last-child { border: none; padding-bottom:0; }
+    .month-name { font-size: 14px; font-weight: 600; color: var(--text); flex:1; }
+    .month-stats { font-size: 12px; color: var(--text-muted); font-family: 'Nunito', sans-serif; font-weight: 700; min-width:80px; text-align:center; }
+    .paid-toggle { padding: 5px 14px; border-radius: 20px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.15s; }
+    .paid-toggle.mark-paid { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .paid-toggle.mark-unpaid { background: #fde8e8; color: #c0392b; border: 1px solid #f5c6cb; }
+
+    /* ─── NOTIFICATION BANNER ─── */
+    .notif-banner { background: linear-gradient(90deg,#fff8e1,#fffde7); border: 1px solid #ffe082; border-radius: var(--radius-sm); padding: 10px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .notif-banner p { font-size: 12px; color: #6d4c00; flex: 1; line-height: 1.5; }
+    .notif-banner button { background: #f9a825; color: white; border: none; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: 'Nunito', sans-serif; }
   </style>
 </head>
 <body>
@@ -622,7 +652,10 @@
     </div>
     <div class="form-group">
       <label>Phone Number</label>
-      <input type="tel" id="buyer-reg-phone" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric">
+      <div class="phone-wrap">
+        <span class="phone-prefix">🇮🇳 +91</span>
+        <input type="tel" id="buyer-reg-phone" placeholder="10-digit number" maxlength="10" inputmode="numeric">
+      </div>
     </div>
     <div class="form-group">
       <label>Create 4-Digit PIN</label>
@@ -651,7 +684,10 @@
   <div class="content">
     <div class="form-group">
       <label>Phone Number</label>
-      <input type="tel" id="buyer-login-phone" placeholder="Your registered phone number" maxlength="10" inputmode="numeric">
+      <div class="phone-wrap">
+        <span class="phone-prefix">🇮🇳 +91</span>
+        <input type="tel" id="buyer-login-phone" placeholder="10-digit number" maxlength="10" inputmode="numeric">
+      </div>
     </div>
     <div class="form-group">
       <label>4-Digit PIN</label>
@@ -662,7 +698,11 @@
         <input type="password" class="pin-cell buyer-login-pin" maxlength="1" inputmode="numeric">
       </div>
     </div>
-    <button class="btn btn-primary mt-12" onclick="loginBuyer()">Login →</button>
+    <div class="remember-row">
+      <input type="checkbox" id="buyer-remember" checked>
+      <label for="buyer-remember">Remember my phone &amp; PIN (auto-fill next time)</label>
+    </div>
+    <button class="btn btn-primary" onclick="loginBuyer()">Login →</button>
     <div class="text-center mt-12">
       <button onclick="goTo('page-buyer-register')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">New here? Create an account</button>
     </div>
@@ -725,7 +765,10 @@
     </div>
     <div class="form-group">
       <label>Farmer's Phone Number</label>
-      <input type="tel" id="add-farmer-phone" placeholder="10-digit number (give this to farmer)" maxlength="10" inputmode="numeric">
+      <div class="phone-wrap">
+        <span class="phone-prefix">🇮🇳 +91</span>
+        <input type="tel" id="add-farmer-phone" placeholder="10-digit (give to farmer)" maxlength="10" inputmode="numeric">
+      </div>
     </div>
     <div class="form-group">
       <label>Price Per Litre (₹)</label>
@@ -800,6 +843,19 @@
       <button class="btn btn-primary" onclick="addMilkEntry()">✓ Save Entry</button>
     </div>
 
+    <!-- Notification banner -->
+    <div class="notif-banner" id="notif-banner" style="display:none;">
+      <span style="font-size:20px;">🔔</span>
+      <p>Enable notifications to alert farmer when new entry is added!</p>
+      <button onclick="requestNotifPermission()">Enable</button>
+    </div>
+
+    <!-- Monthly Paid/Unpaid Section -->
+    <div class="paid-section" id="paid-section">
+      <div class="ps-title">💰 Monthly Payment Status</div>
+      <div id="monthly-payment-container"><div style="color:var(--text-muted);font-size:13px;">Loading...</div></div>
+    </div>
+
     <!-- History -->
     <div class="section-title">📅 Entry History</div>
     <div id="entries-container">
@@ -851,7 +907,10 @@
     </div>
     <div class="form-group">
       <label>Your Phone Number</label>
-      <input type="tel" id="seller-reg-phone" placeholder="Number you gave to your buyer" maxlength="10" inputmode="numeric">
+      <div class="phone-wrap">
+        <span class="phone-prefix">🇮🇳 +91</span>
+        <input type="tel" id="seller-reg-phone" placeholder="Number given to buyer" maxlength="10" inputmode="numeric">
+      </div>
     </div>
     <div class="form-group">
       <label>Create 4-Digit PIN</label>
@@ -880,7 +939,10 @@
   <div class="content">
     <div class="form-group">
       <label>Phone Number</label>
-      <input type="tel" id="seller-login-phone" placeholder="Your phone number" maxlength="10" inputmode="numeric">
+      <div class="phone-wrap">
+        <span class="phone-prefix">🇮🇳 +91</span>
+        <input type="tel" id="seller-login-phone" placeholder="Your phone number" maxlength="10" inputmode="numeric">
+      </div>
     </div>
     <div class="form-group">
       <label>4-Digit PIN</label>
@@ -891,7 +953,11 @@
         <input type="password" class="pin-cell seller-login-pin" maxlength="1" inputmode="numeric">
       </div>
     </div>
-    <button class="btn btn-primary mt-12" onclick="loginSeller()">Login →</button>
+    <div class="remember-row">
+      <input type="checkbox" id="seller-remember" checked>
+      <label for="seller-remember">Remember my phone &amp; PIN (auto-fill next time)</label>
+    </div>
+    <button class="btn btn-primary" onclick="loginSeller()">Login →</button>
     <div class="text-center mt-12">
       <button onclick="goTo('page-seller-register')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">New? Register first</button>
     </div>
@@ -981,11 +1047,9 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-/* ═══════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════
    🔥 FIREBASE CONFIG
-   ➡ Replace these values with YOUR Firebase project config!
-   Get it from: Firebase Console → Project Settings → Your Apps
-═══════════════════════════════════════════════════════════ */
+══════════════════════════════════════════════════════════ */
 const firebaseConfig = {
   apiKey:            "AIzaSyAimFwtYCwBz9WDSak1ztrbqSz0R4tc2JQ",
   authDomain:        "pallu-katha.firebaseapp.com",
@@ -995,39 +1059,36 @@ const firebaseConfig = {
   appId:             "1:1071227739333:web:ec28d65eae3ee36838e4ac"
 };
 
-try {
-  firebase.initializeApp(firebaseConfig);
-} catch(e) {
-  console.warn("Firebase init error (may already be initialized):", e);
-}
+try { firebase.initializeApp(firebaseConfig); } catch(e) {}
 const db = firebase.firestore();
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    STATE
-═══════════════════════════ */
-let currentBuyer  = null;   // { phone, name }
-let currentSeller = null;   // { phone }
-let currentFarmer = null;   // { phone, name, pricePerLiter, ... }
+══════════════════════════════════════ */
+let currentBuyer  = null;
+let currentSeller = null;
+let currentFarmer = null;
 let allFarmers    = [];
 let dateMode      = 'auto';
 let selectedRating = 0;
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    ROUTING
-═══════════════════════════ */
+══════════════════════════════════════ */
 function goTo(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const page = document.getElementById(pageId);
   if (page) page.classList.add('active');
   window.scrollTo(0, 0);
-
   if (pageId === 'page-buyer-dashboard') loadFarmers();
   if (pageId === 'page-seller-dashboard') loadSellerData();
+  if (pageId === 'page-buyer-login') autoFillBuyer();
+  if (pageId === 'page-seller-login') autoFillSeller();
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    PIN HELPERS
-═══════════════════════════ */
+══════════════════════════════════════ */
 function setupPins(cls) {
   const inputs = [...document.querySelectorAll('.' + cls)];
   inputs.forEach((inp, i) => {
@@ -1050,20 +1111,107 @@ function clearPin(cls) {
   document.querySelectorAll('.' + cls).forEach(i => i.value = '');
 }
 
-/* ═══════════════════════════
+function fillPin(cls, pin) {
+  const inputs = [...document.querySelectorAll('.' + cls)];
+  [...pin].forEach((d, i) => { if (inputs[i]) inputs[i].value = d; });
+}
+
+/* ══════════════════════════════════════
+   AUTO-SAVE / AUTO-FILL (localStorage)
+══════════════════════════════════════ */
+function saveCredentials(role, phone, pin) {
+  try {
+    localStorage.setItem('pk_' + role + '_phone', phone);
+    localStorage.setItem('pk_' + role + '_pin', pin);
+  } catch(e) {}
+}
+
+function loadCredentials(role) {
+  try {
+    return {
+      phone: localStorage.getItem('pk_' + role + '_phone') || '',
+      pin:   localStorage.getItem('pk_' + role + '_pin')   || ''
+    };
+  } catch(e) { return { phone: '', pin: '' }; }
+}
+
+function clearCredentials(role) {
+  try {
+    localStorage.removeItem('pk_' + role + '_phone');
+    localStorage.removeItem('pk_' + role + '_pin');
+  } catch(e) {}
+}
+
+function autoFillBuyer() {
+  const creds = loadCredentials('buyer');
+  if (creds.phone) {
+    document.getElementById('buyer-login-phone').value = creds.phone;
+    if (creds.pin) fillPin('buyer-login-pin', creds.pin);
+    document.getElementById('buyer-remember').checked = true;
+  }
+}
+
+function autoFillSeller() {
+  const creds = loadCredentials('seller');
+  if (creds.phone) {
+    document.getElementById('seller-login-phone').value = creds.phone;
+    if (creds.pin) fillPin('seller-login-pin', creds.pin);
+    document.getElementById('seller-remember').checked = true;
+  }
+}
+
+/* ══════════════════════════════════════
    TOAST
-═══════════════════════════ */
+══════════════════════════════════════ */
 function toast(msg, type = '') {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.className = 'show ' + type;
   clearTimeout(el._t);
-  el._t = setTimeout(() => el.className = '', 3000);
+  el._t = setTimeout(() => el.className = '', 3200);
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
+   NOTIFICATIONS
+══════════════════════════════════════ */
+function checkNotifPermission() {
+  if (!('Notification' in window)) return;
+  const banner = document.getElementById('notif-banner');
+  if (!banner) return;
+  if (Notification.permission === 'default') {
+    banner.style.display = 'flex';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function requestNotifPermission() {
+  if (!('Notification' in window)) return toast('Notifications not supported on this device', 'error');
+  Notification.requestPermission().then(perm => {
+    const banner = document.getElementById('notif-banner');
+    if (perm === 'granted') {
+      if (banner) banner.style.display = 'none';
+      toast('Notifications enabled! ✅', 'success');
+      new Notification('పాలు ఖాతా', {
+        body: 'You will now get alerts when milk entries are added!',
+        icon: '/pallu-katha/icon-192.png'
+      });
+    } else {
+      toast('Notifications blocked. Enable in browser settings.', 'error');
+    }
+  });
+}
+
+function sendNotification(title, body) {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '/pallu-katha/icon-192.png' });
+  }
+}
+
+/* ══════════════════════════════════════
    MODALS
-═══════════════════════════ */
+══════════════════════════════════════ */
 function openAddFarmerModal() {
   document.getElementById('modal-add-farmer').classList.add('show');
 }
@@ -1071,96 +1219,81 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('show');
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    BUYER: REGISTER
-═══════════════════════════ */
+══════════════════════════════════════ */
 async function registerBuyer() {
   const name  = document.getElementById('buyer-reg-name').value.trim();
   const phone = document.getElementById('buyer-reg-phone').value.trim();
   const pin   = getPin('buyer-reg-pin');
-
-  if (!name)             return toast('Please enter your name', 'error');
-  if (phone.length !== 10) return toast('Enter a valid 10-digit phone number', 'error');
-  if (!/^\d{10}$/.test(phone)) return toast('Phone must be 10 digits', 'error');
-  if (pin.length !== 4)  return toast('Enter all 4 PIN digits', 'error');
-
+  if (!name)               return toast('Please enter your name', 'error');
+  if (phone.length !== 10) return toast('Enter valid 10-digit phone number', 'error');
+  if (!/^\d{10}$/.test(phone)) return toast('Phone must be 10 digits only', 'error');
+  if (pin.length !== 4)    return toast('Enter all 4 PIN digits', 'error');
   try {
     const doc = await db.collection('buyers').doc(phone).get();
     if (doc.exists) return toast('Phone already registered. Please login.', 'error');
-
     await db.collection('buyers').doc(phone).set({
-      name, phone, pin,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      name, phone, pin, createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-
     toast('Account created! 🎉 Please login.', 'success');
     clearPin('buyer-reg-pin');
     document.getElementById('buyer-reg-name').value = '';
     document.getElementById('buyer-reg-phone').value = '';
     setTimeout(() => goTo('page-buyer-login'), 1200);
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    BUYER: LOGIN
-═══════════════════════════ */
+══════════════════════════════════════ */
 async function loginBuyer() {
-  const phone = document.getElementById('buyer-login-phone').value.trim();
-  const pin   = getPin('buyer-login-pin');
-
+  const phone  = document.getElementById('buyer-login-phone').value.trim();
+  const pin    = getPin('buyer-login-pin');
+  const remember = document.getElementById('buyer-remember').checked;
   if (phone.length !== 10) return toast('Enter your 10-digit phone number', 'error');
   if (pin.length !== 4)    return toast('Enter your 4-digit PIN', 'error');
-
   try {
     const doc = await db.collection('buyers').doc(phone).get();
-    if (!doc.exists)          return toast('Phone number not registered', 'error');
+    if (!doc.exists)           return toast('Phone number not registered', 'error');
     if (doc.data().pin !== pin) return toast('Wrong PIN. Try again.', 'error');
-
     currentBuyer = { phone: doc.data().phone, name: doc.data().name };
+    if (remember) saveCredentials('buyer', phone, pin);
+    else clearCredentials('buyer');
     clearPin('buyer-login-pin');
     document.getElementById('buyer-greeting').textContent = 'Hi, ' + doc.data().name.split(' ')[0] + '!';
     toast('Welcome back, ' + doc.data().name.split(' ')[0] + '! 🥛', 'success');
     goTo('page-buyer-dashboard');
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 function logoutBuyer() {
-  currentBuyer = null;
-  allFarmers = [];
+  currentBuyer = null; allFarmers = [];
   goTo('page-landing');
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    FARMERS: LOAD + RENDER
-═══════════════════════════ */
+══════════════════════════════════════ */
 async function loadFarmers() {
   if (!currentBuyer) return;
   const ctn = document.getElementById('farmer-list-container');
   ctn.innerHTML = '<div class="loading">Loading farmers…</div>';
-
   try {
-    const snap = await db.collection('farmers')
-      .where('buyerPhone', '==', currentBuyer.phone)
-      .get();
-
+    const snap = await db.collection('farmers').where('buyerPhone', '==', currentBuyer.phone).get();
     allFarmers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     document.getElementById('total-farmers-display').textContent = allFarmers.length;
     renderFarmers(allFarmers);
     calcBuyerTotals();
   } catch(e) {
-    ctn.innerHTML = '<div class="empty-state"><p>Error loading farmers.<br>Check your Firebase config.</p></div>';
+    ctn.innerHTML = '<div class="empty-state"><p>Error loading. Check Firebase config.</p></div>';
   }
 }
 
 async function calcBuyerTotals() {
   if (!currentBuyer) return;
   try {
-    const snap = await db.collection('milkEntries')
-      .where('buyerPhone', '==', currentBuyer.phone).get();
+    const snap = await db.collection('milkEntries').where('buyerPhone', '==', currentBuyer.phone).get();
     let tL = 0, tM = 0;
     snap.docs.forEach(d => { tL += d.data().liters || 0; tM += d.data().amount || 0; });
     document.getElementById('total-liters-display').textContent = tL.toFixed(1) + ' L';
@@ -1171,10 +1304,7 @@ async function calcBuyerTotals() {
 function renderFarmers(farmers) {
   const ctn = document.getElementById('farmer-list-container');
   if (!farmers.length) {
-    ctn.innerHTML = `<div class="empty-state">
-      <div class="ei">🐄</div>
-      <p>No farmers added yet.<br>Tap <strong>+</strong> to add your first farmer.</p>
-    </div>`;
+    ctn.innerHTML = '<div class="empty-state"><div class="ei">🐄</div><p>No farmers added yet.<br>Tap <strong>+</strong> to add your first farmer.</p></div>';
     return;
   }
   ctn.innerHTML = farmers.map(f => `
@@ -1182,7 +1312,7 @@ function renderFarmers(farmers) {
       <div class="farmer-avatar">🧑‍🌾</div>
       <div class="farmer-info">
         <div class="name">${escHtml(f.name)}</div>
-        <div class="phone">📞 ${f.phone}</div>
+        <div class="phone">📞 +91 ${f.phone}</div>
       </div>
       <div class="farmer-stats">
         <span class="stat-badge price">₹${f.pricePerLiter}/L</span>
@@ -1196,8 +1326,7 @@ function renderFarmers(farmers) {
 async function loadFarmerBadge(phone) {
   try {
     const snap = await db.collection('milkEntries')
-      .where('farmerPhone', '==', phone)
-      .where('buyerPhone', '==', currentBuyer.phone).get();
+      .where('farmerPhone', '==', phone).where('buyerPhone', '==', currentBuyer.phone).get();
     let tL = 0, tM = 0;
     snap.docs.forEach(d => { tL += d.data().liters || 0; tM += d.data().amount || 0; });
     const el = document.getElementById('fs-' + phone);
@@ -1208,50 +1337,37 @@ async function loadFarmerBadge(phone) {
 function searchFarmers() {
   const q = document.getElementById('farmer-search').value.trim().toLowerCase();
   if (!q) { renderFarmers(allFarmers); return; }
-  renderFarmers(allFarmers.filter(f =>
-    f.name.toLowerCase().includes(q) || f.phone.includes(q)
-  ));
+  renderFarmers(allFarmers.filter(f => f.name.toLowerCase().includes(q) || f.phone.includes(q)));
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    FARMERS: ADD
-═══════════════════════════ */
+══════════════════════════════════════ */
 async function addFarmer() {
   const name  = document.getElementById('add-farmer-name').value.trim();
   const phone = document.getElementById('add-farmer-phone').value.trim();
   const price = parseFloat(document.getElementById('add-farmer-price').value);
-
-  if (!name)              return toast('Enter farmer name', 'error');
+  if (!name)               return toast('Enter farmer name', 'error');
   if (phone.length !== 10) return toast('Enter valid 10-digit phone', 'error');
   if (!price || price <= 0) return toast('Enter valid price per litre', 'error');
-
   try {
-    // Check if this farmer is already added by this buyer
     const existing = await db.collection('farmers').doc(phone).get();
-    if (existing.exists && existing.data().buyerPhone === currentBuyer.phone) {
-      return toast('Farmer already added', 'error');
-    }
-
+    if (existing.exists && existing.data().buyerPhone === currentBuyer.phone) return toast('Farmer already added', 'error');
     await db.collection('farmers').doc(phone).set({
       name, phone, pricePerLiter: price,
       buyerPhone: currentBuyer.phone,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-
     closeModal('modal-add-farmer');
-    ['add-farmer-name','add-farmer-phone','add-farmer-price'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
+    ['add-farmer-name','add-farmer-phone','add-farmer-price'].forEach(id => { document.getElementById(id).value = ''; });
     toast('Farmer ' + name + ' added! 🎉', 'success');
     loadFarmers();
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    FARMER DETAIL
-═══════════════════════════ */
+══════════════════════════════════════ */
 function openFarmerDetail(phone) {
   const f = allFarmers.find(x => x.phone === phone);
   if (!f) return;
@@ -1264,7 +1380,9 @@ function openFarmerDetail(phone) {
   document.getElementById('entry-preview').style.display = 'none';
   setDateMode('auto');
   goTo('page-farmer-detail');
+  checkNotifPermission();
   loadFarmerEntries();
+  loadMonthlyPayments();
 }
 
 function setDateMode(mode) {
@@ -1302,166 +1420,214 @@ function updatePreview() {
   if (l > 0 && p > 0) {
     box.style.display = 'block';
     document.getElementById('preview-amount').textContent = '₹' + (l * p).toFixed(2);
-  } else {
-    box.style.display = 'none';
-  }
+  } else { box.style.display = 'none'; }
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    ADD MILK ENTRY
-═══════════════════════════ */
+══════════════════════════════════════ */
 async function addMilkEntry() {
   if (!currentFarmer || !currentBuyer) return;
-
   const liters = getLiters();
   const price  = parseFloat(document.getElementById('entry-price').value);
   let   date   = dateMode === 'auto' ? todayStr() : document.getElementById('entry-date').value;
-
-  if (!date)            return toast('Select a date', 'error');
+  if (!date)              return toast('Select a date', 'error');
   if (!liters || liters <= 0) return toast('Select or enter litres', 'error');
   if (!price || price <= 0)   return toast('Enter price per litre', 'error');
-
   const amount = parseFloat((liters * price).toFixed(2));
-
   try {
     await db.collection('milkEntries').add({
-      buyerPhone: currentBuyer.phone,
-      farmerPhone: currentFarmer.phone,
+      buyerPhone: currentBuyer.phone, farmerPhone: currentFarmer.phone,
       liters, pricePerLiter: price, amount, date,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-
     document.getElementById('entry-liters-select').value = '';
     document.getElementById('entry-liters-custom').style.display = 'none';
     document.getElementById('entry-liters-custom').value = '';
     document.getElementById('entry-preview').style.display = 'none';
-
     toast('Entry saved! ✅', 'success');
+    sendNotification('పాలు ఖాతా — New Entry Added',
+      currentFarmer.name + ': ' + liters + 'L on ' + fmtDate(date) + ' = ₹' + amount);
     loadFarmerEntries();
+    loadMonthlyPayments();
     calcBuyerTotals();
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    LOAD FARMER ENTRIES
-═══════════════════════════ */
+══════════════════════════════════════ */
 async function loadFarmerEntries() {
   const ctn = document.getElementById('entries-container');
   ctn.innerHTML = '<div class="loading">Loading…</div>';
-
   let entries = [];
   try {
     const snap = await db.collection('milkEntries')
       .where('farmerPhone', '==', currentFarmer.phone)
-      .where('buyerPhone',  '==', currentBuyer.phone)
-      .get();
-    entries = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-      .sort((a, b) => b.date.localeCompare(a.date));
+      .where('buyerPhone',  '==', currentBuyer.phone).get();
+    entries = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => b.date.localeCompare(a.date));
   } catch(e) {
-    ctn.innerHTML = '<div class="empty-state"><p>Error loading entries.</p></div>';
-    return;
+    ctn.innerHTML = '<div class="empty-state"><p>Error loading entries.</p></div>'; return;
   }
-
   if (!entries.length) {
     ctn.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>No entries yet.<br>Add the first one above.</p></div>';
     document.getElementById('farmer-total-liters').textContent = '0 L';
     document.getElementById('farmer-total-money').textContent  = '₹0';
     return;
   }
-
   let tL = 0, tM = 0;
   const rows = entries.map(e => {
     tL += e.liters; tM += e.amount;
-    return `
-      <div class="entry-row">
-        <div class="entry-date">
-          ${fmtDate(e.date)}
-          <small>₹${e.pricePerLiter}/L</small>
-        </div>
-        <div class="entry-lit">${e.liters} L</div>
-        <div class="entry-amt">₹${e.amount.toFixed(0)}</div>
-        <button class="entry-del" onclick="deleteEntry('${e.id}')" title="Delete">🗑</button>
-      </div>`;
+    return `<div class="entry-row">
+      <div class="entry-date">${fmtDate(e.date)}<small>₹${e.pricePerLiter}/L</small></div>
+      <div class="entry-lit">${e.liters} L</div>
+      <div class="entry-amt">₹${e.amount.toFixed(0)}</div>
+      <button class="entry-del" onclick="deleteEntry('${e.id}')" title="Delete">🗑</button>
+    </div>`;
   }).join('');
-
-  ctn.innerHTML = `<div class="card" style="padding:8px 12px;">${rows}</div>`;
+  ctn.innerHTML = '<div class="card" style="padding:8px 12px;">' + rows + '</div>';
   document.getElementById('farmer-total-liters').textContent = tL.toFixed(1) + ' L';
   document.getElementById('farmer-total-money').textContent  = '₹' + tM.toFixed(0);
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
+   MONTHLY PAID / UNPAID
+══════════════════════════════════════ */
+async function loadMonthlyPayments() {
+  if (!currentFarmer || !currentBuyer) return;
+  const ctn = document.getElementById('monthly-payment-container');
+  ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:4px 0;">Loading...</div>';
+
+  try {
+    const snap = await db.collection('milkEntries')
+      .where('farmerPhone', '==', currentFarmer.phone)
+      .where('buyerPhone',  '==', currentBuyer.phone).get();
+
+    if (snap.empty) {
+      ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No entries yet.</div>'; return;
+    }
+
+    // Group by month
+    const months = {};
+    snap.docs.forEach(d => {
+      const data = d.data();
+      const ym = data.date.substring(0, 7); // "2026-03"
+      if (!months[ym]) months[ym] = { liters: 0, amount: 0 };
+      months[ym].liters += data.liters;
+      months[ym].amount += data.amount;
+    });
+
+    // Load paid status
+    const paidSnap = await db.collection('monthlyPayments')
+      .where('farmerPhone', '==', currentFarmer.phone)
+      .where('buyerPhone',  '==', currentBuyer.phone).get();
+    const paidMap = {};
+    paidSnap.docs.forEach(d => { paidMap[d.data().month] = d.id; });
+
+    const sortedMonths = Object.keys(months).sort().reverse();
+
+    ctn.innerHTML = sortedMonths.map(ym => {
+      const isPaid = !!paidMap[ym];
+      const label = fmtMonth(ym);
+      const m = months[ym];
+      return `<div class="month-row">
+        <div class="month-name">${label}</div>
+        <div class="month-stats">${m.liters.toFixed(1)}L · ₹${m.amount.toFixed(0)}</div>
+        <button class="paid-toggle ${isPaid ? 'mark-unpaid' : 'mark-paid'}"
+          onclick="togglePaid('${ym}', ${isPaid}, '${paidMap[ym] || ''}')">
+          ${isPaid ? '✅ Paid' : '⏳ Unpaid'}
+        </button>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">Error loading payments.</div>';
+  }
+}
+
+async function togglePaid(month, isPaid, docId) {
+  if (!currentFarmer || !currentBuyer) return;
+  try {
+    if (isPaid && docId) {
+      await db.collection('monthlyPayments').doc(docId).delete();
+      toast('Marked as Unpaid ⏳', '');
+    } else {
+      await db.collection('monthlyPayments').add({
+        farmerPhone: currentFarmer.phone,
+        buyerPhone: currentBuyer.phone,
+        month, paidAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      toast('Marked as Paid ✅', 'success');
+      sendNotification('పాలు ఖాతా — Payment Marked Paid',
+        currentFarmer.name + ' — ' + fmtMonth(month) + ' payment marked as paid!');
+    }
+    loadMonthlyPayments();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+function fmtMonth(ym) {
+  const [y, m] = ym.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[parseInt(m) - 1] + ' ' + y;
+}
+
+/* ══════════════════════════════════════
    DELETE ENTRY
-═══════════════════════════ */
+══════════════════════════════════════ */
 async function deleteEntry(id) {
   if (!confirm('Delete this entry?')) return;
   try {
     await db.collection('milkEntries').doc(id).delete();
     toast('Entry deleted', '');
     loadFarmerEntries();
+    loadMonthlyPayments();
     calcBuyerTotals();
-  } catch(e) {
-    toast('Could not delete: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Could not delete: ' + e.message, 'error'); }
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    SELLER: REGISTER
-═══════════════════════════ */
+══════════════════════════════════════ */
 async function registerSeller() {
   const phone = document.getElementById('seller-reg-phone').value.trim();
   const pin   = getPin('seller-reg-pin');
-
   if (phone.length !== 10) return toast('Enter valid 10-digit phone number', 'error');
   if (pin.length !== 4)    return toast('Enter all 4 PIN digits', 'error');
-
   try {
-    // Verify this phone was registered by a buyer
     const fDoc = await db.collection('farmers').doc(phone).get();
-    if (!fDoc.exists) {
-      return toast('Number not registered by any buyer. Contact your buyer.', 'error');
-    }
-
+    if (!fDoc.exists) return toast('Number not registered by any buyer. Contact your buyer.', 'error');
     const sDoc = await db.collection('sellers').doc(phone).get();
     if (sDoc.exists) return toast('Already registered. Please login.', 'error');
-
     await db.collection('sellers').doc(phone).set({
-      phone, pin,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      phone, pin, createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-
     toast('Registered! 🎉 Please login.', 'success');
     clearPin('seller-reg-pin');
     document.getElementById('seller-reg-phone').value = '';
     setTimeout(() => goTo('page-seller-login'), 1200);
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    SELLER: LOGIN
-═══════════════════════════ */
+══════════════════════════════════════ */
 async function loginSeller() {
-  const phone = document.getElementById('seller-login-phone').value.trim();
-  const pin   = getPin('seller-login-pin');
-
+  const phone   = document.getElementById('seller-login-phone').value.trim();
+  const pin     = getPin('seller-login-pin');
+  const remember = document.getElementById('seller-remember').checked;
   if (phone.length !== 10) return toast('Enter your 10-digit phone number', 'error');
   if (pin.length !== 4)    return toast('Enter your 4-digit PIN', 'error');
-
   try {
     const doc = await db.collection('sellers').doc(phone).get();
-    if (!doc.exists)          return toast('Not registered. Please register first.', 'error');
+    if (!doc.exists)           return toast('Not registered. Please register first.', 'error');
     if (doc.data().pin !== pin) return toast('Wrong PIN. Try again.', 'error');
-
     currentSeller = { phone };
+    if (remember) saveCredentials('seller', phone, pin);
+    else clearCredentials('seller');
     clearPin('seller-login-pin');
     toast('Welcome! 🥛', 'success');
     goTo('page-seller-dashboard');
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 function logoutSeller() {
@@ -1469,87 +1635,93 @@ function logoutSeller() {
   goTo('page-landing');
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    SELLER DASHBOARD
-═══════════════════════════ */
+══════════════════════════════════════ */
 async function loadSellerData() {
   if (!currentSeller) return;
-
   try {
     const fDoc = await db.collection('farmers').doc(currentSeller.phone).get();
     if (!fDoc.exists) return toast('Farmer details not found', 'error');
-
     const farmer = fDoc.data();
     const bDoc   = await db.collection('buyers').doc(farmer.buyerPhone).get();
     const buyerName = bDoc.exists ? bDoc.data().name : farmer.buyerPhone;
 
     document.getElementById('seller-name-display').textContent  = farmer.name;
-    document.getElementById('seller-phone-display').textContent = '📞 ' + farmer.phone;
+    document.getElementById('seller-phone-display').textContent = '📞 +91 ' + farmer.phone;
     document.getElementById('seller-price-display').textContent = '₹' + farmer.pricePerLiter + ' per litre';
     document.getElementById('seller-buyer-display').textContent = 'Buyer: ' + buyerName;
 
-    const snap = await db.collection('milkEntries')
-      .where('farmerPhone', '==', currentSeller.phone).get();
-    const entries = snap.docs.map(d => d.data())
-      .sort((a, b) => b.date.localeCompare(a.date));
+    const snap = await db.collection('milkEntries').where('farmerPhone', '==', currentSeller.phone).get();
+    const entries = snap.docs.map(d => d.data()).sort((a, b) => b.date.localeCompare(a.date));
+
+    // Load paid months
+    const paidSnap = await db.collection('monthlyPayments').where('farmerPhone', '==', currentSeller.phone).get();
+    const paidMonths = new Set();
+    paidSnap.docs.forEach(d => paidMonths.add(d.data().month));
 
     const ctn = document.getElementById('seller-entries-container');
-
     if (!entries.length) {
-      ctn.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>No records yet.<br>Your buyer hasn\'t added any entries.</p></div>';
-      return;
+      ctn.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>No records yet.</p></div>'; return;
     }
 
     let tL = 0, tM = 0;
-    const tableBody = entries.map(e => {
+    // Group by month for paid status
+    const monthGroups = {};
+    entries.forEach(e => {
       tL += e.liters; tM += e.amount;
-      return `<tr>
-        <td>${fmtDate(e.date)}</td>
-        <td><strong>${e.liters} L</strong></td>
-        <td>₹${e.pricePerLiter}</td>
-        <td class="amt-cell">₹${e.amount.toFixed(0)}</td>
-      </tr>`;
+      const ym = e.date.substring(0, 7);
+      if (!monthGroups[ym]) monthGroups[ym] = { liters: 0, amount: 0 };
+      monthGroups[ym].liters += e.liters;
+      monthGroups[ym].amount += e.amount;
+    });
+
+    const tableBody = entries.map(e => `<tr>
+      <td>${fmtDate(e.date)}</td>
+      <td><strong>${e.liters} L</strong></td>
+      <td>₹${e.pricePerLiter}</td>
+      <td class="amt-cell">₹${e.amount.toFixed(0)}</td>
+    </tr>`).join('');
+
+    // Monthly summary with paid status for seller view
+    const monthSummary = Object.keys(monthGroups).sort().reverse().map(ym => {
+      const isPaid = paidMonths.has(ym);
+      const m = monthGroups[ym];
+      return `<div class="month-row">
+        <div class="month-name">${fmtMonth(ym)}</div>
+        <div class="month-stats">${m.liters.toFixed(1)}L · ₹${m.amount.toFixed(0)}</div>
+        <span class="paid-badge ${isPaid ? 'paid' : 'unpaid'}">${isPaid ? '✅ Paid' : '⏳ Unpaid'}</span>
+      </div>`;
     }).join('');
 
     ctn.innerHTML = `
+      <div class="paid-section" style="margin-bottom:14px;">
+        <div class="ps-title">💰 Monthly Payment Status</div>
+        ${monthSummary}
+      </div>
       <div class="card" style="padding:0;overflow:hidden;border-radius:var(--radius);">
         <table class="milk-table">
-          <thead>
-            <tr>
-              <th>Date</th><th>Litres</th><th>Rate</th><th>Amount</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Date</th><th>Litres</th><th>Rate</th><th>Amount</th></tr></thead>
           <tbody>${tableBody}</tbody>
         </table>
       </div>
       <div class="card card-green" style="margin-top:12px;text-align:center;">
-        <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px;">Summary</div>
+        <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:8px;">Summary</div>
         <div style="display:flex;justify-content:space-around;">
-          <div>
-            <div style="font-size:22px;font-weight:800;color:var(--green-800);font-family:'Nunito';">${tL.toFixed(1)} L</div>
-            <div style="font-size:11px;color:var(--text-muted);">Total Litres</div>
-          </div>
-          <div>
-            <div style="font-size:22px;font-weight:800;color:var(--green-800);font-family:'Nunito';">₹${tM.toFixed(0)}</div>
-            <div style="font-size:11px;color:var(--text-muted);">Total Earned</div>
-          </div>
-          <div>
-            <div style="font-size:22px;font-weight:800;color:var(--green-800);font-family:'Nunito';">${entries.length}</div>
-            <div style="font-size:11px;color:var(--text-muted);">Days</div>
-          </div>
+          <div><div style="font-size:22px;font-weight:800;color:var(--green-800);font-family:'Nunito';">${tL.toFixed(1)} L</div><div style="font-size:11px;color:var(--text-muted);">Total Litres</div></div>
+          <div><div style="font-size:22px;font-weight:800;color:var(--green-800);font-family:'Nunito';">₹${tM.toFixed(0)}</div><div style="font-size:11px;color:var(--text-muted);">Total Earned</div></div>
+          <div><div style="font-size:22px;font-weight:800;color:var(--green-800);font-family:'Nunito';">${entries.length}</div><div style="font-size:11px;color:var(--text-muted);">Days</div></div>
         </div>
       </div>`;
 
     document.getElementById('seller-total-liters').textContent = tL.toFixed(1) + ' L';
     document.getElementById('seller-total-money').textContent  = '₹' + tM.toFixed(0);
-  } catch(e) {
-    toast('Error loading data: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Error loading data: ' + e.message, 'error'); }
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    REVIEW
-═══════════════════════════ */
+══════════════════════════════════════ */
 const RATING_LABELS = ['', '😞 Poor', '😐 Fair', '🙂 Good', '😊 Great', '🤩 Excellent!'];
 function setRating(n) {
   selectedRating = n;
@@ -1560,26 +1732,19 @@ function setRating(n) {
 async function submitReview() {
   if (!selectedRating) return toast('Please tap a star to rate', 'error');
   const comment = document.getElementById('review-text').value.trim();
-  try {
-    await db.collection('reviews').add({
-      rating: selectedRating, comment,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch(e) {}
+  try { await db.collection('reviews').add({ rating: selectedRating, comment, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); } catch(e) {}
   toast('Thank you for your review! 🌟', 'success');
   document.getElementById('review-text').value = '';
   setRating(0);
   setTimeout(() => goTo('page-landing'), 2000);
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    UTILS
-═══════════════════════════ */
+══════════════════════════════════════ */
 function todayStr() {
   const d = new Date();
-  return d.getFullYear() + '-' +
-    String(d.getMonth() + 1).padStart(2, '0') + '-' +
-    String(d.getDate()).padStart(2, '0');
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
 function fmtDate(str) {
@@ -1593,9 +1758,9 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* ═══════════════════════════
+/* ══════════════════════════════════════
    INIT
-═══════════════════════════ */
+══════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   setupPins('buyer-reg-pin');
   setupPins('buyer-login-pin');
@@ -1605,18 +1770,15 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('entry-price').addEventListener('input', updatePreview);
   document.getElementById('entry-liters-custom').addEventListener('input', updatePreview);
 
-  // Close modal on backdrop click
   document.getElementById('modal-add-farmer').addEventListener('click', function(e) {
     if (e.target === this) closeModal('modal-add-farmer');
   });
 
-  // Service Worker
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
+    navigator.serviceWorker.register('/pallu-katha/sw.js')
       .then(() => console.log('SW registered'))
       .catch(e => console.log('SW error:', e));
   }
 });
 </script>
 </body>
-</html>
