@@ -2127,58 +2127,61 @@ async function loadMonthlyPayments() {
   ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:4px 0;">Loading...</div>';
 
   try {
-    // Get milk entries — only one where() needed, no composite index required
-    const snap = await db.collection('milkEntries')
-      .where('farmerPhone', '==', currentFarmer.phone).get();
+    // Single where() — no composite index needed
+    const [entrySnap, paidSnap] = await Promise.all([
+      db.collection('milkEntries').where('farmerPhone', '==', currentFarmer.phone).get(),
+      db.collection('monthlyPayments').where('farmerPhone', '==', currentFarmer.phone).get()
+    ]);
 
-    // Filter by buyer on client side
-    const myEntries = snap.docs
-      .map(d => d.data())
+    // Filter by buyer client-side
+    const myEntries = entrySnap.docs.map(d => d.data())
       .filter(d => d.buyerPhone === currentBuyer.phone);
 
     if (!myEntries.length) {
-      ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No entries yet.</div>'; return;
+      ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No entries yet.</div>';
+      return;
     }
 
-    // Group by month
+    // Group entries by month
     const months = {};
     myEntries.forEach(data => {
-      const ym = (data.date || '').substring(0, 7); // "2026-03"
+      const ym = (data.date || '').substring(0, 7);
       if (!ym) return;
       if (!months[ym]) months[ym] = { liters: 0, amount: 0 };
       months[ym].liters += (data.liters || 0);
       months[ym].amount += (data.amount || 0);
     });
 
-    // Load paid status — use unique doc ID = buyerPhone_farmerPhone_month (no index needed)
-    const paidSnap = await db.collection('monthlyPayments')
-      .where('farmerPhone', '==', currentFarmer.phone).get();
-
-    // Build paid map — key = month, value = doc ID
+    // Build paid map — filter by buyer client-side
     const paidMap = {};
     paidSnap.docs.forEach(d => {
       const data = d.data();
-      // Only count if same buyer
       if (data.buyerPhone === currentBuyer.phone) {
         paidMap[data.month] = d.id;
       }
     });
 
     const sortedMonths = Object.keys(months).sort().reverse();
-
     if (!sortedMonths.length) {
-      ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No entries yet.</div>'; return;
+      ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No entries yet.</div>';
+      return;
     }
 
+    // Render — give each button a unique ID for instant update
     ctn.innerHTML = sortedMonths.map(ym => {
       const isPaid = !!paidMap[ym];
       const docId  = paidMap[ym] || '';
-      const m = months[ym];
-      return `<div class="month-row">
+      const m      = months[ym];
+      return `<div class="month-row" id="row-${ym}">
         <div class="month-name">${fmtMonth(ym)}</div>
         <div class="month-stats">${m.liters.toFixed(1)}L · ₹${m.amount.toFixed(0)}</div>
-        <button class="paid-toggle ${isPaid ? 'mark-unpaid' : 'mark-paid'}"
-          onclick="togglePaid('${ym}', ${isPaid}, '${docId}')">
+        <button
+          id="btn-paid-${ym}"
+          data-month="${ym}"
+          data-paid="${isPaid}"
+          data-docid="${docId}"
+          class="paid-toggle ${isPaid ? 'mark-unpaid' : 'mark-paid'}"
+          onclick="togglePaid(this)">
           ${isPaid ? '✅ Paid' : '⏳ Unpaid'}
         </button>
       </div>`;
@@ -2190,33 +2193,68 @@ async function loadMonthlyPayments() {
   }
 }
 
-async function togglePaid(month, isPaid, docId) {
+// ── INSTANT tap — optimistic UI, Firebase in background ──
+async function togglePaid(btn) {
   if (!currentFarmer || !currentBuyer) return;
+  if (btn.disabled) return;          // prevent double-tap
+
+  const month  = btn.dataset.month;
+  const isPaid = btn.dataset.paid === 'true';
+  const docId  = btn.dataset.docid || '';
+
+  // ── STEP 1: Update button IMMEDIATELY (optimistic UI) ──
+  btn.disabled = true;
+  if (isPaid) {
+    // Switch to UNPAID instantly
+    btn.textContent   = '⏳ Unpaid';
+    btn.className     = 'paid-toggle mark-paid';
+    btn.dataset.paid  = 'false';
+    btn.dataset.docid = '';
+  } else {
+    // Switch to PAID instantly
+    btn.textContent  = '✅ Paid';
+    btn.className    = 'paid-toggle mark-unpaid';
+    btn.dataset.paid = 'true';
+  }
+
+  // ── STEP 2: Sync with Firebase in background ──
   try {
-    if (isPaid === true || isPaid === 'true') {
-      // Mark as UNPAID — delete the payment record
-      if (docId && docId.length > 0) {
-        await db.collection('monthlyPayments').doc(docId).delete();
-      }
+    if (isPaid) {
+      // Remove paid record
+      if (docId) await db.collection('monthlyPayments').doc(docId).delete();
       toast('Marked as Unpaid ⏳', '');
     } else {
-      // Mark as PAID — add a new payment record
-      await db.collection('monthlyPayments').add({
+      // Add paid record
+      const ref = await db.collection('monthlyPayments').add({
         farmerPhone: currentFarmer.phone,
         buyerPhone:  currentBuyer.phone,
         farmerName:  currentFarmer.name,
         month:       month,
         paidAt:      firebase.firestore.FieldValue.serverTimestamp()
       });
+      // Store new doc ID so next tap can delete it
+      btn.dataset.docid = ref.id;
       toast('Marked as Paid ✅', 'success');
       sendNotification('పాలు ఖాతా — Payment Marked Paid',
-        currentFarmer.name + ' — ' + fmtMonth(month) + ' payment marked as paid!');
+        currentFarmer.name + ' — ' + fmtMonth(month) + ' marked as paid!');
     }
-    // Reload to reflect change
-    await loadMonthlyPayments();
   } catch(e) {
+    // ── STEP 3: Rollback if Firebase failed ──
     console.error('togglePaid error:', e);
-    toast('Error: ' + e.message, 'error');
+    toast('Error saving. Please try again.', 'error');
+    if (isPaid) {
+      btn.textContent   = '✅ Paid';
+      btn.className     = 'paid-toggle mark-unpaid';
+      btn.dataset.paid  = 'true';
+      btn.dataset.docid = docId;
+    } else {
+      btn.textContent   = '⏳ Unpaid';
+      btn.className     = 'paid-toggle mark-paid';
+      btn.dataset.paid  = 'false';
+      btn.dataset.docid = '';
+    }
+  } finally {
+    btn.disabled = false;   // re-enable after Firebase done
   }
 }
 
