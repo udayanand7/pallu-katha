@@ -550,9 +550,57 @@
     .notif-banner { background: linear-gradient(90deg,#fff8e1,#fffde7); border: 1px solid #ffe082; border-radius: var(--radius-sm); padding: 10px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .notif-banner p { font-size: 12px; color: #6d4c00; flex: 1; line-height: 1.5; }
     .notif-banner button { background: #f9a825; color: white; border: none; border-radius: 20px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: 'Nunito', sans-serif; }
+
+    /* ─── SPLASH SCREEN ─── */
+    #splash-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: linear-gradient(160deg, var(--green-900) 0%, var(--green-700) 60%, var(--green-500) 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 16px;
+    }
+    #splash-screen img {
+      width: 110px; height: 110px;
+      border-radius: 24px;
+      object-fit: cover;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      animation: splashPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both;
+    }
+    @keyframes splashPop {
+      0%   { transform: scale(0.4); opacity: 0; }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+    #splash-screen .splash-name {
+      font-family: 'Nunito', sans-serif;
+      font-size: 28px; font-weight: 900;
+      color: white; letter-spacing: -0.5px;
+      animation: splashPop 0.5s 0.15s cubic-bezier(0.175,0.885,0.32,1.275) both;
+    }
+    #splash-screen .splash-sub {
+      font-size: 13px; color: rgba(255,255,255,0.75);
+      font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+      animation: splashPop 0.5s 0.25s cubic-bezier(0.175,0.885,0.32,1.275) both;
+    }
+    #splash-screen .splash-spinner {
+      width: 28px; height: 28px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-top: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
+
+<!-- SPLASH SCREEN — shown while checking auto-login -->
+<div id="splash-screen">
+  <img src="logo.jpeg" alt="పాలు ఖాతా">
+  <div class="splash-name">పాలు ఖాతా</div>
+  <div class="splash-sub">Digital Dairy Account</div>
+  <div class="splash-spinner"></div>
+</div>
 
 <!-- TOAST -->
 <div id="toast"></div>
@@ -1075,16 +1123,73 @@ let selectedRating = 0;
 /* ══════════════════════════════════════
    ROUTING
 ══════════════════════════════════════ */
-function goTo(pageId) {
+/* ══════════════════════════════════════
+   PAGE HISTORY STACK — for phone back button
+══════════════════════════════════════ */
+const pageHistory = [];
+
+// Pages where back button should EXIT app (show confirm or go home)
+const ROOT_PAGES = ['page-landing', 'page-buyer-dashboard', 'page-seller-dashboard'];
+
+function goTo(pageId, addToHistory = true) {
+  const currentPage = document.querySelector('.page.active');
+  const currentId   = currentPage ? currentPage.id : null;
+
+  // Add current page to history stack before leaving
+  if (addToHistory && currentId && currentId !== pageId) {
+    pageHistory.push(currentId);
+  }
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const page = document.getElementById(pageId);
   if (page) page.classList.add('active');
   window.scrollTo(0, 0);
+
+  // Push a state so popstate fires on phone back button
+  window.history.pushState({ page: pageId }, '', '');
+
   if (pageId === 'page-buyer-dashboard') loadFarmers();
   if (pageId === 'page-seller-dashboard') loadSellerData();
   if (pageId === 'page-buyer-login') autoFillBuyer();
   if (pageId === 'page-seller-login') autoFillSeller();
 }
+
+function goBack() {
+  const currentPage = document.querySelector('.page.active');
+  const currentId   = currentPage ? currentPage.id : 'page-landing';
+
+  // If we have history stack, go to previous page
+  if (pageHistory.length > 0) {
+    const prevPage = pageHistory.pop();
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const page = document.getElementById(prevPage);
+    if (page) page.classList.add('active');
+    window.scrollTo(0, 0);
+    if (prevPage === 'page-buyer-dashboard') loadFarmers();
+    if (prevPage === 'page-seller-dashboard') loadSellerData();
+    return;
+  }
+
+  // If on dashboard — confirm exit
+  if (ROOT_PAGES.includes(currentId)) {
+    if (confirm('Exit పాలు ఖాతా app?')) {
+      // Close the app / go to blank
+      window.history.go(-(window.history.length));
+    } else {
+      // Push state again so back button works next time
+      window.history.pushState({ page: currentId }, '', '');
+    }
+    return;
+  }
+
+  // Default — go to landing
+  goTo('page-landing');
+}
+
+// Listen for phone back button
+window.addEventListener('popstate', (e) => {
+  goBack();
+});
 
 /* ══════════════════════════════════════
    PIN HELPERS
@@ -1133,6 +1238,69 @@ function loadCredentials(role) {
       pin:   localStorage.getItem('pk_' + role + '_pin')   || ''
     };
   } catch(e) { return { phone: '', pin: '' }; }
+}
+
+
+/* ══════════════════════════════════════
+   SESSION — AUTO LOGIN
+══════════════════════════════════════ */
+function saveSession(role, data) {
+  try { localStorage.setItem('pk_session_role', role);
+        localStorage.setItem('pk_session_data', JSON.stringify(data)); } catch(e) {}
+}
+
+function loadSession() {
+  try {
+    const role = localStorage.getItem('pk_session_role');
+    const data = JSON.parse(localStorage.getItem('pk_session_data') || 'null');
+    return { role, data };
+  } catch(e) { return { role: null, data: null }; }
+}
+
+function clearSession() {
+  try {
+    localStorage.removeItem('pk_session_role');
+    localStorage.removeItem('pk_session_data');
+  } catch(e) {}
+}
+
+async function tryAutoLogin() {
+  const { role, data } = loadSession();
+  if (!role || !data) {
+    // No session — show landing normally
+    showSplash(false);
+    return;
+  }
+
+  try {
+    if (role === 'buyer') {
+      const doc = await db.collection('buyers').doc(data.phone).get();
+      if (doc.exists && doc.data().pin === data.pin) {
+        currentBuyer = { phone: doc.data().phone, name: doc.data().name };
+        document.getElementById('buyer-greeting').textContent = 'Hi, ' + doc.data().name.split(' ')[0] + '!';
+        showSplash(false);
+        goTo('page-buyer-dashboard');
+        return;
+      }
+    } else if (role === 'seller') {
+      const doc = await db.collection('sellers').doc(data.phone).get();
+      if (doc.exists && doc.data().pin === data.pin) {
+        currentSeller = { phone: data.phone };
+        showSplash(false);
+        goTo('page-seller-dashboard');
+        return;
+      }
+    }
+  } catch(e) { console.log('Auto-login error:', e); }
+
+  // Session invalid — clear it and show landing
+  clearSession();
+  showSplash(false);
+}
+
+function showSplash(show) {
+  const splash = document.getElementById('splash-screen');
+  if (splash) splash.style.display = show ? 'flex' : 'none';
 }
 
 function clearCredentials(role) {
@@ -1260,6 +1428,7 @@ async function loginBuyer() {
     currentBuyer = { phone: doc.data().phone, name: doc.data().name };
     if (remember) saveCredentials('buyer', phone, pin);
     else clearCredentials('buyer');
+    saveSession('buyer', { phone, pin });
     clearPin('buyer-login-pin');
     document.getElementById('buyer-greeting').textContent = 'Hi, ' + doc.data().name.split(' ')[0] + '!';
     toast('Welcome back, ' + doc.data().name.split(' ')[0] + '! 🥛', 'success');
@@ -1269,6 +1438,7 @@ async function loginBuyer() {
 
 function logoutBuyer() {
   currentBuyer = null; allFarmers = [];
+  clearSession();
   goTo('page-landing');
 }
 
@@ -1624,6 +1794,7 @@ async function loginSeller() {
     currentSeller = { phone };
     if (remember) saveCredentials('seller', phone, pin);
     else clearCredentials('seller');
+    saveSession('seller', { phone, pin });
     clearPin('seller-login-pin');
     toast('Welcome! 🥛', 'success');
     goTo('page-seller-dashboard');
@@ -1632,6 +1803,7 @@ async function loginSeller() {
 
 function logoutSeller() {
   currentSeller = null;
+  clearSession();
   goTo('page-landing');
 }
 
@@ -1779,6 +1951,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(() => console.log('SW registered'))
       .catch(e => console.log('SW error:', e));
   }
+
+  // AUTO LOGIN — check if user was already logged in
+  tryAutoLogin();
 });
 </script>
 </body>
