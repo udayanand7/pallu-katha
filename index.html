@@ -2123,73 +2123,101 @@ async function loadFarmerEntries() {
 async function loadMonthlyPayments() {
   if (!currentFarmer || !currentBuyer) return;
   const ctn = document.getElementById('monthly-payment-container');
+  if (!ctn) return;
   ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:4px 0;">Loading...</div>';
 
   try {
+    // Get milk entries — only one where() needed, no composite index required
     const snap = await db.collection('milkEntries')
-      .where('farmerPhone', '==', currentFarmer.phone)
-      .where('buyerPhone',  '==', currentBuyer.phone).get();
+      .where('farmerPhone', '==', currentFarmer.phone).get();
 
-    if (snap.empty) {
+    // Filter by buyer on client side
+    const myEntries = snap.docs
+      .map(d => d.data())
+      .filter(d => d.buyerPhone === currentBuyer.phone);
+
+    if (!myEntries.length) {
       ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No entries yet.</div>'; return;
     }
 
     // Group by month
     const months = {};
-    snap.docs.forEach(d => {
-      const data = d.data();
-      const ym = data.date.substring(0, 7); // "2026-03"
+    myEntries.forEach(data => {
+      const ym = (data.date || '').substring(0, 7); // "2026-03"
+      if (!ym) return;
       if (!months[ym]) months[ym] = { liters: 0, amount: 0 };
-      months[ym].liters += data.liters;
-      months[ym].amount += data.amount;
+      months[ym].liters += (data.liters || 0);
+      months[ym].amount += (data.amount || 0);
     });
 
-    // Load paid status
+    // Load paid status — use unique doc ID = buyerPhone_farmerPhone_month (no index needed)
     const paidSnap = await db.collection('monthlyPayments')
-      .where('farmerPhone', '==', currentFarmer.phone)
-      .where('buyerPhone',  '==', currentBuyer.phone).get();
+      .where('farmerPhone', '==', currentFarmer.phone).get();
+
+    // Build paid map — key = month, value = doc ID
     const paidMap = {};
-    paidSnap.docs.forEach(d => { paidMap[d.data().month] = d.id; });
+    paidSnap.docs.forEach(d => {
+      const data = d.data();
+      // Only count if same buyer
+      if (data.buyerPhone === currentBuyer.phone) {
+        paidMap[data.month] = d.id;
+      }
+    });
 
     const sortedMonths = Object.keys(months).sort().reverse();
 
+    if (!sortedMonths.length) {
+      ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No entries yet.</div>'; return;
+    }
+
     ctn.innerHTML = sortedMonths.map(ym => {
       const isPaid = !!paidMap[ym];
-      const label = fmtMonth(ym);
+      const docId  = paidMap[ym] || '';
       const m = months[ym];
       return `<div class="month-row">
-        <div class="month-name">${label}</div>
+        <div class="month-name">${fmtMonth(ym)}</div>
         <div class="month-stats">${m.liters.toFixed(1)}L · ₹${m.amount.toFixed(0)}</div>
         <button class="paid-toggle ${isPaid ? 'mark-unpaid' : 'mark-paid'}"
-          onclick="togglePaid('${ym}', ${isPaid}, '${paidMap[ym] || ''}')">
+          onclick="togglePaid('${ym}', ${isPaid}, '${docId}')">
           ${isPaid ? '✅ Paid' : '⏳ Unpaid'}
         </button>
       </div>`;
     }).join('');
 
   } catch(e) {
-    ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">Error loading payments.</div>';
+    console.error('loadMonthlyPayments error:', e);
+    ctn.innerHTML = '<div style="color:var(--danger);font-size:13px;">⚠️ Error: ' + e.message + '</div>';
   }
 }
 
 async function togglePaid(month, isPaid, docId) {
   if (!currentFarmer || !currentBuyer) return;
   try {
-    if (isPaid && docId) {
-      await db.collection('monthlyPayments').doc(docId).delete();
+    if (isPaid === true || isPaid === 'true') {
+      // Mark as UNPAID — delete the payment record
+      if (docId && docId.length > 0) {
+        await db.collection('monthlyPayments').doc(docId).delete();
+      }
       toast('Marked as Unpaid ⏳', '');
     } else {
+      // Mark as PAID — add a new payment record
       await db.collection('monthlyPayments').add({
         farmerPhone: currentFarmer.phone,
-        buyerPhone: currentBuyer.phone,
-        month, paidAt: firebase.firestore.FieldValue.serverTimestamp()
+        buyerPhone:  currentBuyer.phone,
+        farmerName:  currentFarmer.name,
+        month:       month,
+        paidAt:      firebase.firestore.FieldValue.serverTimestamp()
       });
       toast('Marked as Paid ✅', 'success');
       sendNotification('పాలు ఖాతా — Payment Marked Paid',
         currentFarmer.name + ' — ' + fmtMonth(month) + ' payment marked as paid!');
     }
-    loadMonthlyPayments();
-  } catch(e) { toast('Error: ' + e.message, 'error'); }
+    // Reload to reflect change
+    await loadMonthlyPayments();
+  } catch(e) {
+    console.error('togglePaid error:', e);
+    toast('Error: ' + e.message, 'error');
+  }
 }
 
 function fmtMonth(ym) {
@@ -2285,9 +2313,13 @@ async function loadSellerData() {
     const entries = snap.docs.map(d => d.data()).sort((a, b) => b.date.localeCompare(a.date));
 
     // Load paid months
-    const paidSnap = await db.collection('monthlyPayments').where('farmerPhone', '==', currentSeller.phone).get();
+    const paidSnap = await db.collection('monthlyPayments')
+      .where('farmerPhone', '==', currentSeller.phone).get();
     const paidMonths = new Set();
-    paidSnap.docs.forEach(d => paidMonths.add(d.data().month));
+    paidSnap.docs.forEach(d => {
+      // show paid status for all buyers (seller sees all)
+      paidMonths.add(d.data().month);
+    });
 
     const ctn = document.getElementById('seller-entries-container');
     if (!entries.length) {
