@@ -1,0 +1,26 @@
+{
+  "name": "పాలు ఖాతా - Digital Dairy Account",
+  "short_name": "పాలు ఖాతా",
+  "description": "Daily milk collection tracker for buyers and farmers",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a6b2a",
+  "theme_color": "#1a6b2a",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "productivity", "utilities"],
+  "lang": "en"
+}

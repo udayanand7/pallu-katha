@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a6b2a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="పాలు ఖాతా">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>పాలు ఖాతా — Digital Dairy Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --green-900: #1b4020;
+      --green-800: #1a6b2a;
+      --green-700: #217a33;
+      --green-600: #2e9144;
+      --green-500: #3aad54;
+      --green-400: #5dc470;
+      --green-200: #b2debb;
+      --green-100: #d8f0dc;
+      --green-50:  #f0faf2;
+      --white: #ffffff;
+      --gray-50: #f8f9f8;
+      --gray-100: #f0f1f0;
+      --gray-200: #e0e2e0;
+      --gray-400: #9ea59e;
+      --gray-700: #3d4a3d;
+      --text: #1c2b1c;
+      --text-soft: #4a5c4a;
+      --text-muted: #7a917a;
+      --danger: #c0392b;
+      --danger-pale: #fdf0ef;
+      --shadow-sm: 0 1px 4px rgba(26,107,42,0.08);
+      --shadow-md: 0 4px 16px rgba(26,107,42,0.12);
+      --shadow-lg: 0 8px 32px rgba(26,107,42,0.16);
+      --radius: 14px;
+      --radius-sm: 8px;
+      --radius-lg: 20px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background: var(--gray-50);
+      color: var(--text);
+      min-height: 100vh;
+      max-width: 430px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    h1, h2, h3, .stat-val, .fab { font-family: 'Nunito', sans-serif; }
+
+    /* ─── PAGE SYSTEM ─── */
+    .page { display: none; min-height: 100vh; flex-direction: column; animation: fadeIn 0.25s ease; }
+    .page.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    /* ─── HEADER ─── */
+    .header {
+      background: var(--green-800);
+      color: white;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .header h1 { font-size: 19px; font-weight: 800; flex: 1; letter-spacing: 0.2px; }
+    .back-btn {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .logout-btn {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ─── CONTENT ─── */
+    .content { flex: 1; padding: 16px; overflow-y: auto; }
+
+    /* ─── CARDS ─── */
+    .card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-green {
+      background: var(--green-50);
+      border-color: var(--green-200);
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.12s, box-shadow 0.12s;
+      font-family: 'Nunito', sans-serif;
+      letter-spacing: 0.2px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--green-800); color: white; box-shadow: 0 3px 12px rgba(26,107,42,0.25); }
+    .btn-primary:hover { background: var(--green-700); }
+    .btn-secondary { background: white; color: var(--green-800); border: 2px solid var(--green-600); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-ghost { background: none; border: none; color: var(--text-muted); font-size: 13px; cursor: pointer; padding: 10px; font-family: inherit; }
+
+    /* ─── FORM ─── */
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-soft);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-family: 'Noto Sans', sans-serif;
+      background: white;
+      color: var(--text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(58,173,84,0.12);
+    }
+
+    /* ─── PIN INPUTS ─── */
+    .pin-row { display: flex; gap: 10px; justify-content: center; margin: 4px 0; }
+    .pin-cell {
+      width: 58px !important;
+      text-align: center;
+      font-size: 26px !important;
+      font-weight: 800 !important;
+      font-family: 'Nunito', sans-serif !important;
+      padding: 10px 0 !important;
+      border-radius: 10px !important;
+    }
+
+    /* ─── SEARCH ─── */
+    .search-wrap {
+      padding: 12px 16px 4px;
+      background: var(--green-800);
+    }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 10px;
+      padding: 9px 12px;
+      gap: 8px;
+    }
+    .search-bar input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: white;
+      font-family: 'Noto Sans', sans-serif;
+    }
+    .search-bar input::placeholder { color: rgba(255,255,255,0.6); }
+    .search-bar .ico { color: rgba(255,255,255,0.7); font-size: 16px; }
+
+    /* ─── FARMER CARD ─── */
+    .farmer-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .farmer-card:active { transform: scale(0.98); box-shadow: var(--shadow-md); }
+    .farmer-avatar {
+      width: 44px; height: 44px;
+      background: var(--green-100);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .farmer-info { flex: 1; min-width: 0; }
+    .farmer-info .name { font-weight: 700; font-size: 15px; color: var(--text); font-family: 'Nunito', sans-serif; }
+    .farmer-info .phone { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .farmer-stats { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+    .stat-badge {
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      color: var(--green-800);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-family: 'Nunito', sans-serif;
+      white-space: nowrap;
+    }
+    .stat-badge.price { background: var(--green-800); color: white; border-color: var(--green-800); }
+
+    /* ─── ENTRY ROW ─── */
+    .entry-row {
+      display: flex;
+      align-items: center;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--gray-100);
+      gap: 10px;
+    }
+    .entry-row:last-child { border-bottom: none; }
+    .entry-date { font-size: 13px; color: var(--text-soft); flex: 1; }
+    .entry-date small { display: block; font-size: 11px; color: var(--text-muted); }
+    .entry-lit { font-weight: 700; color: var(--green-700); font-size: 14px; font-family: 'Nunito', sans-serif; min-width: 48px; text-align: center; }
+    .entry-amt { font-weight: 800; color: var(--text); font-size: 14px; font-family: 'Nunito', sans-serif; text-align: right; min-width: 64px; }
+    .entry-del { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 4px; }
+
+    /* ─── TOTAL BAR ─── */
+    .total-bar {
+      background: var(--green-900);
+      color: white;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-around;
+      gap: 8px;
+    }
+    .total-item { text-align: center; }
+    .total-item .stat-val { font-size: 22px; font-weight: 800; display: block; font-family: 'Nunito', sans-serif; }
+    .total-item .stat-lbl { font-size: 11px; opacity: 0.75; margin-top: 1px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ─── LANDING ─── */
+    .landing-hero {
+      background: linear-gradient(160deg, var(--green-900) 0%, var(--green-700) 60%, var(--green-500) 100%);
+      color: white;
+      padding: 48px 24px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .landing-hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .landing-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 150px; height: 150px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    .landing-hero .hero-icon { font-size: 64px; margin-bottom: 14px; display: block; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+    .landing-hero h1 { font-size: 34px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .landing-hero p { font-size: 15px; opacity: 0.85; }
+
+    .role-section { padding: 20px 16px 8px; }
+    .role-section h2 { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+
+    .role-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: white;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      transition: all 0.18s;
+      box-shadow: var(--shadow-sm);
+    }
+    .role-btn:active { transform: scale(0.97); box-shadow: var(--shadow-md); }
+    .role-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .role-icon.buyer { background: linear-gradient(135deg, #d8f0dc, #b2debb); }
+    .role-icon.seller { background: linear-gradient(135deg, #fef9e7, #fdedb0); }
+    .role-text h3 { font-size: 17px; font-weight: 800; color: var(--text); font-family: 'Nunito', sans-serif; }
+    .role-text p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .role-arrow { margin-left: auto; color: var(--green-600); font-size: 22px; font-family: 'Nunito', sans-serif; font-weight: 800; }
+
+    /* ─── INSTALL BOX ─── */
+    .install-box {
+      margin: 4px 16px 16px;
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+    .install-box h3 { font-size: 13px; font-weight: 700; color: var(--green-800); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .install-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; font-size: 12.5px; color: var(--text-soft); line-height: 1.5; }
+    .install-step:last-child { margin-bottom: 0; }
+    .step-num { background: var(--green-800); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; flex-shrink: 0; font-family: 'Nunito', sans-serif; margin-top: 1px; }
+
+    /* ─── AUTH PAGE ─── */
+    .auth-hero {
+      background: linear-gradient(145deg, var(--green-900), var(--green-600));
+      color: white;
+      padding: 40px 24px 32px;
+      text-align: center;
+    }
+    .auth-hero .emoji { font-size: 52px; margin-bottom: 10px; display: block; }
+    .auth-hero h2 { font-size: 24px; font-weight: 800; }
+    .auth-hero p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+    .auth-btns { padding: 24px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ─── TOAST ─── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--gray-700);
+      color: white;
+      padding: 11px 22px;
+      border-radius: 25px;
+      font-size: 13.5px;
+      font-weight: 600;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.25s, transform 0.25s;
+      max-width: 300px;
+      text-align: center;
+      pointer-events: none;
+      font-family: 'Nunito', sans-serif;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.success { background: var(--green-700); }
+    #toast.error { background: var(--danger); }
+
+    /* ─── DATE TOGGLE ─── */
+    .date-toggle {
+      display: flex;
+      background: var(--gray-100);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .date-toggle button {
+      flex: 1; padding: 9px; border: none;
+      background: transparent; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s; color: var(--text-soft);
+      font-family: 'Nunito', sans-serif;
+    }
+    .date-toggle button.active { background: var(--green-800); color: white; border-radius: var(--radius-sm); }
+
+    /* ─── PREVIEW CHIP ─── */
+    .preview-box {
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      display: none;
+      animation: fadeIn 0.2s;
+    }
+    .preview-box .lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .preview-box .val { font-size: 24px; font-weight: 900; color: var(--green-800); font-family: 'Nunito', sans-serif; }
+
+    /* ─── MODAL ─── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 200;
+      align-items: flex-end;
+    }
+    .modal-overlay.show { display: flex; animation: fadeIn 0.2s; }
+    .modal-sheet {
+      background: white; border-radius: 22px 22px 0 0;
+      padding: 20px 16px 36px; width: 100%;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.12);
+    }
+    .modal-title {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+    }
+    .modal-title h3 { font-size: 18px; font-weight: 800; color: var(--text); font-family: 'Nunito', sans-serif; }
+    .modal-close { background: var(--gray-100); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+
+    /* ─── TABLE ─── */
+    .milk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .milk-table thead tr { background: var(--green-800); }
+    .milk-table thead th { color: white; padding: 10px 10px; text-align: left; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .milk-table tbody tr { border-bottom: 1px solid var(--gray-100); }
+    .milk-table tbody tr:last-child { border: none; }
+    .milk-table tbody tr:nth-child(even) { background: var(--green-50); }
+    .milk-table td { padding: 10px 10px; vertical-align: middle; }
+    .milk-table .amt-cell { font-weight: 800; color: var(--green-800); font-family: 'Nunito', sans-serif; }
+
+    /* ─── STARS ─── */
+    .stars { display: flex; gap: 10px; justify-content: center; margin: 16px 0 6px; }
+    .star { font-size: 36px; cursor: pointer; filter: grayscale(1) opacity(0.35); transition: filter 0.15s, transform 0.1s; }
+    .star.active { filter: none; transform: scale(1.1); }
+    #rating-label { text-align: center; font-size: 15px; color: var(--text-soft); font-weight: 600; min-height: 22px; margin-bottom: 16px; font-family: 'Nunito', sans-serif; }
+
+    /* ─── INFO CHIP ─── */
+    .chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; font-family: 'Nunito', sans-serif;
+    }
+    .chip-green { background: var(--green-100); color: var(--green-800); border: 1px solid var(--green-200); }
+    .chip-dark { background: var(--green-800); color: white; }
+
+    /* ─── MISC ─── */
+    .fab {
+      position: fixed; bottom: 80px; right: 20px;
+      width: 54px; height: 54px; border-radius: 50%;
+      background: var(--green-800); color: white;
+      font-size: 28px; font-weight: 800; border: none; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(26,107,42,0.35);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 50; font-family: 'Nunito', sans-serif;
+      transition: transform 0.12s, box-shadow 0.12s;
+    }
+    .fab:active { transform: scale(0.93); }
+
+    .empty-state { text-align: center; padding: 40px 20px; }
+    .empty-state .ei { font-size: 48px; margin-bottom: 10px; }
+    .empty-state p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+
+    .loading { text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px; }
+    .loading::before { content: '⏳ '; }
+
+    .divider { height: 1px; background: var(--gray-100); margin: 14px 0; }
+    .text-center { text-align: center; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .section-title { font-size: 13px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-family: 'Nunito', sans-serif; }
+
+    /* Review page special section */
+    .review-hero { background: linear-gradient(145deg, var(--green-900), var(--green-700)); color: white; padding: 40px 24px 32px; text-align: center; }
+    .review-hero .big { font-size: 60px; margin-bottom: 10px; display: block; }
+    .review-hero h2 { font-size: 24px; font-weight: 800; }
+    .review-hero p { font-size: 13px; opacity: 0.8; margin-top: 5px; }
+
+    /* review navigation bottom link */
+    .review-link { text-align: center; padding: 8px 16px 16px; font-size: 13px; color: var(--text-muted); }
+    .review-link button { background: none; border: none; color: var(--green-700); font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; }
+
+    /* seller badge view only */
+    .view-only-badge {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #856404;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    /* bottom nav review link */
+    .bottom-review {
+      text-align: center;
+      padding: 10px 16px;
+      background: white;
+      border-top: 1px solid var(--gray-100);
+    }
+    .bottom-review button {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 12px; cursor: pointer; font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════════
+     PAGE: LANDING
+══════════════════════════════════════ -->
+<div id="page-landing" class="page active">
+  <!-- Banner Hero -->
+  <div style="position:relative;width:100%;background:#fff;overflow:hidden;">
+    <img src="banner.png" alt="పాలు ఖాతా - Milk Collection System"
+      style="width:100%;display:block;border-radius:0 0 18px 18px;box-shadow:0 4px 16px rgba(0,0,0,0.12);">
+  </div>
+
+  <!-- Logo + App Name strip -->
+  <div style="display:flex;align-items:center;gap:12px;padding:14px 16px 4px;background:white;border-bottom:1px solid var(--gray-100);">
+    <img src="logo.jpeg" alt="Logo"
+      style="width:54px;height:54px;border-radius:12px;object-fit:cover;box-shadow:var(--shadow-sm);">
+    <div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;color:var(--green-900);line-height:1.1;">పాలు ఖాతా</div>
+      <div style="font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Digital Dairy Account</div>
+    </div>
+  </div>
+
+  <div class="role-section">
+    <h2>Choose your role</h2>
+    <button class="role-btn" onclick="goTo('page-buyer-auth')">
+      <div class="role-icon buyer">🛒</div>
+      <div class="role-text">
+        <h3>Buyer</h3>
+        <p>Collect &amp; manage milk from farmers</p>
+      </div>
+      <span class="role-arrow">›</span>
+    </button>
+    <button class="role-btn" onclick="goTo('page-seller-auth')">
+      <div class="role-icon seller">🐄</div>
+      <div class="role-text">
+        <h3>Farmer / Seller</h3>
+        <p>View your daily milk &amp; payments</p>
+      </div>
+      <span class="role-arrow">›</span>
+    </button>
+  </div>
+
+  <div class="install-box">
+    <h3>📲 Add to Home Screen</h3>
+    <div class="install-step">
+      <div class="step-num">A</div>
+      <div><strong>iPhone (Safari):</strong> Tap the Share button (□↑) at the bottom → tap <em>"Add to Home Screen"</em> → tap <em>Add</em></div>
+    </div>
+    <div class="install-step">
+      <div class="step-num">B</div>
+      <div><strong>Android (Chrome):</strong> Tap the ⋮ menu (top-right) → tap <em>"Add to Home Screen"</em> or <em>"Install app"</em> → tap <em>Install</em></div>
+    </div>
+    <div class="install-step">
+      <div class="step-num">C</div>
+      <div><strong>Desktop Chrome:</strong> Click the ⊕ install icon in the address bar → tap <em>Install</em></div>
+    </div>
+  </div>
+
+  <div class="review-link">
+    <button onclick="goTo('page-review')">⭐ Leave a Review</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: BUYER AUTH
+══════════════════════════════════════ -->
+<div id="page-buyer-auth" class="page">
+  <div class="auth-hero">
+    <img src="logo.jpeg" alt="Logo" style="width:80px;height:80px;border-radius:20px;object-fit:cover;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+    <h2>Buyer Account</h2>
+    <p>Track milk collection from your farmers</p>
+  </div>
+  <div class="auth-btns">
+    <button class="btn btn-primary" onclick="goTo('page-buyer-register')">📝 &nbsp; Create Account</button>
+    <button class="btn btn-secondary" onclick="goTo('page-buyer-login')">🔐 &nbsp; Login</button>
+    <button class="btn-ghost btn" onclick="goTo('page-landing')">← Back to Home</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: BUYER REGISTER
+══════════════════════════════════════ -->
+<div id="page-buyer-register" class="page">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('page-buyer-auth')">‹</button>
+    <h1>Create Buyer Account</h1>
+  </div>
+  <div class="content">
+    <div class="card card-green" style="margin-bottom:18px;">
+      <div style="font-size:13px;color:var(--green-900);">📋 Register as a milk buyer to track daily milk collection from your farmers.</div>
+    </div>
+    <div class="form-group">
+      <label>Your Full Name</label>
+      <input type="text" id="buyer-reg-name" placeholder="e.g. Suresh Kumar" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="buyer-reg-phone" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric">
+    </div>
+    <div class="form-group">
+      <label>Create 4-Digit PIN</label>
+      <div class="pin-row">
+        <input type="password" class="pin-cell buyer-reg-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell buyer-reg-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell buyer-reg-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell buyer-reg-pin" maxlength="1" inputmode="numeric">
+      </div>
+    </div>
+    <button class="btn btn-primary mt-12" onclick="registerBuyer()">Create Account →</button>
+    <div class="text-center mt-12">
+      <button onclick="goTo('page-buyer-login')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">Already have an account? Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: BUYER LOGIN
+══════════════════════════════════════ -->
+<div id="page-buyer-login" class="page">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('page-buyer-auth')">‹</button>
+    <h1>Buyer Login</h1>
+  </div>
+  <div class="content">
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="buyer-login-phone" placeholder="Your registered phone number" maxlength="10" inputmode="numeric">
+    </div>
+    <div class="form-group">
+      <label>4-Digit PIN</label>
+      <div class="pin-row">
+        <input type="password" class="pin-cell buyer-login-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell buyer-login-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell buyer-login-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell buyer-login-pin" maxlength="1" inputmode="numeric">
+      </div>
+    </div>
+    <button class="btn btn-primary mt-12" onclick="loginBuyer()">Login →</button>
+    <div class="text-center mt-12">
+      <button onclick="goTo('page-buyer-register')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">New here? Create an account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: BUYER DASHBOARD
+══════════════════════════════════════ -->
+<div id="page-buyer-dashboard" class="page">
+  <div class="header">
+    <img src="logo.jpeg" alt="Logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover;">
+    <h1 id="buyer-greeting">పాలు ఖాతా</h1>
+    <button class="logout-btn" onclick="logoutBuyer()">Logout</button>
+  </div>
+
+  <!-- Search bar (inside green header area) -->
+  <div class="search-wrap">
+    <div class="search-bar">
+      <span class="ico">🔍</span>
+      <input type="text" id="farmer-search" placeholder="Search by name or phone…" oninput="searchFarmers()">
+    </div>
+  </div>
+
+  <!-- Farmer list -->
+  <div class="content" id="farmer-list-container" style="padding-top:14px;">
+    <div class="loading">Loading farmers…</div>
+  </div>
+
+  <!-- Total bar -->
+  <div class="total-bar" id="buyer-total-bar">
+    <div class="total-item">
+      <span class="stat-val" id="total-liters-display">0 L</span>
+      <div class="stat-lbl">Total Litres</div>
+    </div>
+    <div class="total-item">
+      <span class="stat-val" id="total-money-display">₹0</span>
+      <div class="stat-lbl">Total Money</div>
+    </div>
+    <div class="total-item">
+      <span class="stat-val" id="total-farmers-display">0</span>
+      <div class="stat-lbl">Farmers</div>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <button class="fab" onclick="openAddFarmerModal()" title="Add Farmer">+</button>
+</div>
+
+<!-- ──────── ADD FARMER MODAL ──────── -->
+<div id="modal-add-farmer" class="modal-overlay">
+  <div class="modal-sheet">
+    <div class="modal-title">
+      <h3>➕ Add New Farmer</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-farmer')">×</button>
+    </div>
+    <div class="form-group">
+      <label>Farmer's Name</label>
+      <input type="text" id="add-farmer-name" placeholder="Full name">
+    </div>
+    <div class="form-group">
+      <label>Farmer's Phone Number</label>
+      <input type="tel" id="add-farmer-phone" placeholder="10-digit number (give this to farmer)" maxlength="10" inputmode="numeric">
+    </div>
+    <div class="form-group">
+      <label>Price Per Litre (₹)</label>
+      <input type="number" id="add-farmer-price" placeholder="e.g. 32" min="1" max="999" inputmode="numeric">
+    </div>
+    <button class="btn btn-primary" onclick="addFarmer()">✓ Add Farmer</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: FARMER DETAIL (Buyer view)
+══════════════════════════════════════ -->
+<div id="page-farmer-detail" class="page">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('page-buyer-dashboard')">‹</button>
+    <h1 id="farmer-detail-name">Farmer</h1>
+    <span id="farmer-detail-price-badge" style="font-size:13px;opacity:0.9;font-family:'Nunito';font-weight:700;"></span>
+  </div>
+
+  <div class="content">
+    <!-- Add Entry Card -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="section-title">📋 Add Milk Entry</div>
+
+      <div class="form-group">
+        <label>Date</label>
+        <div class="date-toggle">
+          <button id="btn-date-auto" class="active" onclick="setDateMode('auto')">🗓 Auto (Today)</button>
+          <button id="btn-date-manual" onclick="setDateMode('manual')">✏️ Manual</button>
+        </div>
+        <input type="date" id="entry-date" style="display:none;">
+      </div>
+
+      <div class="form-group">
+        <label>Litres Collected</label>
+        <div style="display:flex;gap:8px;">
+          <select id="entry-liters-select" onchange="onLiterChange()" style="flex:1;">
+            <option value="">— Select Litres —</option>
+            <option value="0.5">0.5 L</option>
+            <option value="1">1 L</option>
+            <option value="1.5">1.5 L</option>
+            <option value="2">2 L</option>
+            <option value="2.5">2.5 L</option>
+            <option value="3">3 L</option>
+            <option value="3.5">3.5 L</option>
+            <option value="4">4 L</option>
+            <option value="4.5">4.5 L</option>
+            <option value="5">5 L</option>
+            <option value="5.5">5.5 L</option>
+            <option value="6">6 L</option>
+            <option value="45">45 L</option>
+            <option value="50">50 L</option>
+            <option value="55">55 L</option>
+            <option value="60">60 L</option>
+            <option value="custom">Custom...</option>
+          </select>
+          <input type="number" id="entry-liters-custom" placeholder="L" min="0.1" step="0.5" inputmode="decimal"
+            style="width:82px;padding:12px 8px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:15px;display:none;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Price Per Litre (₹)</label>
+        <input type="number" id="entry-price" placeholder="₹ per litre" min="1" inputmode="numeric" oninput="updatePreview()">
+      </div>
+
+      <div class="preview-box" id="entry-preview">
+        <div class="lbl">Amount to Pay</div>
+        <div class="val" id="preview-amount">₹0</div>
+      </div>
+
+      <button class="btn btn-primary" onclick="addMilkEntry()">✓ Save Entry</button>
+    </div>
+
+    <!-- History -->
+    <div class="section-title">📅 Entry History</div>
+    <div id="entries-container">
+      <div class="loading">Loading entries…</div>
+    </div>
+  </div>
+
+  <div class="total-bar">
+    <div class="total-item">
+      <span class="stat-val" id="farmer-total-liters">0 L</span>
+      <div class="stat-lbl">Total Litres</div>
+    </div>
+    <div class="total-item">
+      <span class="stat-val" id="farmer-total-money">₹0</span>
+      <div class="stat-lbl">Total Amount</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: SELLER AUTH
+══════════════════════════════════════ -->
+<div id="page-seller-auth" class="page">
+  <div class="auth-hero" style="background:linear-gradient(145deg,#1a3d20,#2d7a3a);">
+    <img src="logo.jpeg" alt="Logo" style="width:80px;height:80px;border-radius:20px;object-fit:cover;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+    <h2>Farmer / Seller</h2>
+    <p>View your milk sales &amp; daily payments</p>
+  </div>
+  <div class="auth-btns">
+    <button class="btn btn-primary" onclick="goTo('page-seller-register')">📝 &nbsp; Register</button>
+    <button class="btn btn-secondary" onclick="goTo('page-seller-login')">🔐 &nbsp; Login</button>
+    <button class="btn-ghost btn" onclick="goTo('page-landing')">← Back to Home</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: SELLER REGISTER
+══════════════════════════════════════ -->
+<div id="page-seller-register" class="page">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('page-seller-auth')">‹</button>
+    <h1>Farmer Register</h1>
+  </div>
+  <div class="content">
+    <div class="card card-green" style="margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--green-900);line-height:1.6;">
+        🔒 <strong>Only number given by buyer</strong> can register here
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Your Phone Number</label>
+      <input type="tel" id="seller-reg-phone" placeholder="Number you gave to your buyer" maxlength="10" inputmode="numeric">
+    </div>
+    <div class="form-group">
+      <label>Create 4-Digit PIN</label>
+      <div class="pin-row">
+        <input type="password" class="pin-cell seller-reg-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell seller-reg-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell seller-reg-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell seller-reg-pin" maxlength="1" inputmode="numeric">
+      </div>
+    </div>
+    <button class="btn btn-primary mt-12" onclick="registerSeller()">Register →</button>
+    <div class="text-center mt-16" style="font-size:12px;color:var(--text-muted);padding:0 8px;line-height:1.6;">
+      Only the number given to buyer will work here
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: SELLER LOGIN
+══════════════════════════════════════ -->
+<div id="page-seller-login" class="page">
+  <div class="header">
+    <button class="back-btn" onclick="goTo('page-seller-auth')">‹</button>
+    <h1>Farmer Login</h1>
+  </div>
+  <div class="content">
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="seller-login-phone" placeholder="Your phone number" maxlength="10" inputmode="numeric">
+    </div>
+    <div class="form-group">
+      <label>4-Digit PIN</label>
+      <div class="pin-row">
+        <input type="password" class="pin-cell seller-login-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell seller-login-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell seller-login-pin" maxlength="1" inputmode="numeric">
+        <input type="password" class="pin-cell seller-login-pin" maxlength="1" inputmode="numeric">
+      </div>
+    </div>
+    <button class="btn btn-primary mt-12" onclick="loginSeller()">Login →</button>
+    <div class="text-center mt-12">
+      <button onclick="goTo('page-seller-register')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">New? Register first</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: SELLER DASHBOARD
+══════════════════════════════════════ -->
+<div id="page-seller-dashboard" class="page">
+  <div class="header">
+    <img src="logo.jpeg" alt="Logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover;">
+    <h1>My Milk Records</h1>
+    <button class="logout-btn" onclick="logoutSeller()">Logout</button>
+  </div>
+
+  <div class="content">
+    <!-- View-only badge -->
+    <div class="view-only-badge">👀 View Only — Your buyer manages all entries</div>
+
+    <!-- Farmer info card -->
+    <div class="card card-green" style="margin-bottom:16px;">
+      <div style="font-size:17px;font-weight:800;color:var(--green-900);font-family:'Nunito',sans-serif;" id="seller-name-display">—</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:2px;" id="seller-phone-display">—</div>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="chip chip-dark" id="seller-price-display">₹— per litre</span>
+        <span class="chip chip-green" id="seller-buyer-display">Buyer: —</span>
+      </div>
+    </div>
+
+    <div class="section-title">📅 Daily Records</div>
+    <div id="seller-entries-container">
+      <div class="loading">Loading records…</div>
+    </div>
+  </div>
+
+  <div class="total-bar">
+    <div class="total-item">
+      <span class="stat-val" id="seller-total-liters">0 L</span>
+      <div class="stat-lbl">Total Litres</div>
+    </div>
+    <div class="total-item">
+      <span class="stat-val" id="seller-total-money">₹0</span>
+      <div class="stat-lbl">Total Earned</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE: REVIEW
+══════════════════════════════════════ -->
+<div id="page-review" class="page">
+  <div class="review-hero">
+    <img src="logo.jpeg" alt="Logo" style="width:80px;height:80px;border-radius:20px;object-fit:cover;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+    <h2>Rate పాలు ఖాతా</h2>
+    <p>Help us improve with your feedback</p>
+  </div>
+  <div class="content">
+    <div class="card" style="margin-top:4px;">
+      <div style="text-align:center;">
+        <div style="font-size:15px;font-weight:700;color:var(--text-soft);margin-bottom:4px;">How was your experience?</div>
+        <div class="stars">
+          <span class="star" onclick="setRating(1)">⭐</span>
+          <span class="star" onclick="setRating(2)">⭐</span>
+          <span class="star" onclick="setRating(3)">⭐</span>
+          <span class="star" onclick="setRating(4)">⭐</span>
+          <span class="star" onclick="setRating(5)">⭐</span>
+        </div>
+        <div id="rating-label"></div>
+      </div>
+      <div class="form-group">
+        <label>Your Comments (Optional)</label>
+        <textarea id="review-text" rows="4" placeholder="What do you like? What can we improve?"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="submitReview()">Submit Review 🚀</button>
+    </div>
+  </div>
+  <div class="review-link">
+    <button onclick="goTo('page-landing')">← Back to Home</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     FIREBASE SDK
+══════════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   🔥 FIREBASE CONFIG
+   ➡ Replace these values with YOUR Firebase project config!
+   Get it from: Firebase Console → Project Settings → Your Apps
+═══════════════════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey:            "AIzaSyAimFwtYCwBz9WDSak1ztrbqSz0R4tc2JQ",
+  authDomain:        "pallu-katha.firebaseapp.com",
+  projectId:         "pallu-katha",
+  storageBucket:     "pallu-katha.firebasestorage.app",
+  messagingSenderId: "1071227739333",
+  appId:             "1:1071227739333:web:ec28d65eae3ee36838e4ac"
+};
+};
+
+try {
+  firebase.initializeApp(firebaseConfig);
+} catch(e) {
+  console.warn("Firebase init error (may already be initialized):", e);
+}
+const db = firebase.firestore();
+
+/* ═══════════════════════════
+   STATE
+═══════════════════════════ */
+let currentBuyer  = null;   // { phone, name }
+let currentSeller = null;   // { phone }
+let currentFarmer = null;   // { phone, name, pricePerLiter, ... }
+let allFarmers    = [];
+let dateMode      = 'auto';
+let selectedRating = 0;
+
+/* ═══════════════════════════
+   ROUTING
+═══════════════════════════ */
+function goTo(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById(pageId);
+  if (page) page.classList.add('active');
+  window.scrollTo(0, 0);
+
+  if (pageId === 'page-buyer-dashboard') loadFarmers();
+  if (pageId === 'page-seller-dashboard') loadSellerData();
+}
+
+/* ═══════════════════════════
+   PIN HELPERS
+═══════════════════════════ */
+function setupPins(cls) {
+  const inputs = [...document.querySelectorAll('.' + cls)];
+  inputs.forEach((inp, i) => {
+    inp.addEventListener('input', () => {
+      inp.value = inp.value.replace(/\D/, '');
+      if (inp.value && i < inputs.length - 1) inputs[i + 1].focus();
+      if (inp.value && i === inputs.length - 1) inp.blur();
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !inp.value && i > 0) inputs[i - 1].focus();
+    });
+  });
+}
+
+function getPin(cls) {
+  return [...document.querySelectorAll('.' + cls)].map(i => i.value).join('');
+}
+
+function clearPin(cls) {
+  document.querySelectorAll('.' + cls).forEach(i => i.value = '');
+}
+
+/* ═══════════════════════════
+   TOAST
+═══════════════════════════ */
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className = '', 3000);
+}
+
+/* ═══════════════════════════
+   MODALS
+═══════════════════════════ */
+function openAddFarmerModal() {
+  document.getElementById('modal-add-farmer').classList.add('show');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+/* ═══════════════════════════
+   BUYER: REGISTER
+═══════════════════════════ */
+async function registerBuyer() {
+  const name  = document.getElementById('buyer-reg-name').value.trim();
+  const phone = document.getElementById('buyer-reg-phone').value.trim();
+  const pin   = getPin('buyer-reg-pin');
+
+  if (!name)             return toast('Please enter your name', 'error');
+  if (phone.length !== 10) return toast('Enter a valid 10-digit phone number', 'error');
+  if (!/^\d{10}$/.test(phone)) return toast('Phone must be 10 digits', 'error');
+  if (pin.length !== 4)  return toast('Enter all 4 PIN digits', 'error');
+
+  try {
+    const doc = await db.collection('buyers').doc(phone).get();
+    if (doc.exists) return toast('Phone already registered. Please login.', 'error');
+
+    await db.collection('buyers').doc(phone).set({
+      name, phone, pin,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    toast('Account created! 🎉 Please login.', 'success');
+    clearPin('buyer-reg-pin');
+    document.getElementById('buyer-reg-name').value = '';
+    document.getElementById('buyer-reg-phone').value = '';
+    setTimeout(() => goTo('page-buyer-login'), 1200);
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════
+   BUYER: LOGIN
+═══════════════════════════ */
+async function loginBuyer() {
+  const phone = document.getElementById('buyer-login-phone').value.trim();
+  const pin   = getPin('buyer-login-pin');
+
+  if (phone.length !== 10) return toast('Enter your 10-digit phone number', 'error');
+  if (pin.length !== 4)    return toast('Enter your 4-digit PIN', 'error');
+
+  try {
+    const doc = await db.collection('buyers').doc(phone).get();
+    if (!doc.exists)          return toast('Phone number not registered', 'error');
+    if (doc.data().pin !== pin) return toast('Wrong PIN. Try again.', 'error');
+
+    currentBuyer = { phone: doc.data().phone, name: doc.data().name };
+    clearPin('buyer-login-pin');
+    document.getElementById('buyer-greeting').textContent = 'Hi, ' + doc.data().name.split(' ')[0] + '!';
+    toast('Welcome back, ' + doc.data().name.split(' ')[0] + '! 🥛', 'success');
+    goTo('page-buyer-dashboard');
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+function logoutBuyer() {
+  currentBuyer = null;
+  allFarmers = [];
+  goTo('page-landing');
+}
+
+/* ═══════════════════════════
+   FARMERS: LOAD + RENDER
+═══════════════════════════ */
+async function loadFarmers() {
+  if (!currentBuyer) return;
+  const ctn = document.getElementById('farmer-list-container');
+  ctn.innerHTML = '<div class="loading">Loading farmers…</div>';
+
+  try {
+    const snap = await db.collection('farmers')
+      .where('buyerPhone', '==', currentBuyer.phone)
+      .get();
+
+    allFarmers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('total-farmers-display').textContent = allFarmers.length;
+    renderFarmers(allFarmers);
+    calcBuyerTotals();
+  } catch(e) {
+    ctn.innerHTML = '<div class="empty-state"><p>Error loading farmers.<br>Check your Firebase config.</p></div>';
+  }
+}
+
+async function calcBuyerTotals() {
+  if (!currentBuyer) return;
+  try {
+    const snap = await db.collection('milkEntries')
+      .where('buyerPhone', '==', currentBuyer.phone).get();
+    let tL = 0, tM = 0;
+    snap.docs.forEach(d => { tL += d.data().liters || 0; tM += d.data().amount || 0; });
+    document.getElementById('total-liters-display').textContent = tL.toFixed(1) + ' L';
+    document.getElementById('total-money-display').textContent  = '₹' + tM.toFixed(0);
+  } catch(e) {}
+}
+
+function renderFarmers(farmers) {
+  const ctn = document.getElementById('farmer-list-container');
+  if (!farmers.length) {
+    ctn.innerHTML = `<div class="empty-state">
+      <div class="ei">🐄</div>
+      <p>No farmers added yet.<br>Tap <strong>+</strong> to add your first farmer.</p>
+    </div>`;
+    return;
+  }
+  ctn.innerHTML = farmers.map(f => `
+    <div class="farmer-card" onclick="openFarmerDetail('${f.phone}')">
+      <div class="farmer-avatar">🧑‍🌾</div>
+      <div class="farmer-info">
+        <div class="name">${escHtml(f.name)}</div>
+        <div class="phone">📞 ${f.phone}</div>
+      </div>
+      <div class="farmer-stats">
+        <span class="stat-badge price">₹${f.pricePerLiter}/L</span>
+        <span class="stat-badge" id="fs-${f.phone}">…</span>
+      </div>
+    </div>
+  `).join('');
+  farmers.forEach(f => loadFarmerBadge(f.phone));
+}
+
+async function loadFarmerBadge(phone) {
+  try {
+    const snap = await db.collection('milkEntries')
+      .where('farmerPhone', '==', phone)
+      .where('buyerPhone', '==', currentBuyer.phone).get();
+    let tL = 0, tM = 0;
+    snap.docs.forEach(d => { tL += d.data().liters || 0; tM += d.data().amount || 0; });
+    const el = document.getElementById('fs-' + phone);
+    if (el) el.textContent = tL.toFixed(1) + 'L · ₹' + tM.toFixed(0);
+  } catch(e) {}
+}
+
+function searchFarmers() {
+  const q = document.getElementById('farmer-search').value.trim().toLowerCase();
+  if (!q) { renderFarmers(allFarmers); return; }
+  renderFarmers(allFarmers.filter(f =>
+    f.name.toLowerCase().includes(q) || f.phone.includes(q)
+  ));
+}
+
+/* ═══════════════════════════
+   FARMERS: ADD
+═══════════════════════════ */
+async function addFarmer() {
+  const name  = document.getElementById('add-farmer-name').value.trim();
+  const phone = document.getElementById('add-farmer-phone').value.trim();
+  const price = parseFloat(document.getElementById('add-farmer-price').value);
+
+  if (!name)              return toast('Enter farmer name', 'error');
+  if (phone.length !== 10) return toast('Enter valid 10-digit phone', 'error');
+  if (!price || price <= 0) return toast('Enter valid price per litre', 'error');
+
+  try {
+    // Check if this farmer is already added by this buyer
+    const existing = await db.collection('farmers').doc(phone).get();
+    if (existing.exists && existing.data().buyerPhone === currentBuyer.phone) {
+      return toast('Farmer already added', 'error');
+    }
+
+    await db.collection('farmers').doc(phone).set({
+      name, phone, pricePerLiter: price,
+      buyerPhone: currentBuyer.phone,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    closeModal('modal-add-farmer');
+    ['add-farmer-name','add-farmer-phone','add-farmer-price'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    toast('Farmer ' + name + ' added! 🎉', 'success');
+    loadFarmers();
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════
+   FARMER DETAIL
+═══════════════════════════ */
+function openFarmerDetail(phone) {
+  const f = allFarmers.find(x => x.phone === phone);
+  if (!f) return;
+  currentFarmer = f;
+  document.getElementById('farmer-detail-name').textContent = f.name;
+  document.getElementById('farmer-detail-price-badge').textContent = '₹' + f.pricePerLiter + '/L';
+  document.getElementById('entry-price').value = f.pricePerLiter;
+  document.getElementById('entry-liters-select').value = '';
+  document.getElementById('entry-liters-custom').style.display = 'none';
+  document.getElementById('entry-preview').style.display = 'none';
+  setDateMode('auto');
+  goTo('page-farmer-detail');
+  loadFarmerEntries();
+}
+
+function setDateMode(mode) {
+  dateMode = mode;
+  const inp = document.getElementById('entry-date');
+  const bA  = document.getElementById('btn-date-auto');
+  const bM  = document.getElementById('btn-date-manual');
+  if (mode === 'auto') {
+    inp.style.display = 'none';
+    bA.classList.add('active'); bM.classList.remove('active');
+  } else {
+    inp.style.display = 'block';
+    bM.classList.add('active'); bA.classList.remove('active');
+    inp.value = todayStr();
+  }
+}
+
+function onLiterChange() {
+  const sel = document.getElementById('entry-liters-select');
+  const cus = document.getElementById('entry-liters-custom');
+  cus.style.display = sel.value === 'custom' ? 'block' : 'none';
+  if (sel.value === 'custom') cus.focus();
+  updatePreview();
+}
+
+function getLiters() {
+  const sel = document.getElementById('entry-liters-select').value;
+  if (sel === 'custom') return parseFloat(document.getElementById('entry-liters-custom').value) || 0;
+  return parseFloat(sel) || 0;
+}
+
+function updatePreview() {
+  const l = getLiters(), p = parseFloat(document.getElementById('entry-price').value);
+  const box = document.getElementById('entry-preview');
+  if (l > 0 && p > 0) {
+    box.style.display = 'block';
+    document.getElementById('preview-amount').textContent = '₹' + (l * p).toFixed(2);
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+/* ═══════════════════════════
+   ADD MILK ENTRY
+═══════════════════════════ */
+async function addMilkEntry() {
+  if (!currentFarmer || !currentBuyer) return;
+
+  const liters = getLiters();
+  const price  = parseFloat(document.getElementById('entry-price').value);
+  let   date   = dateMode === 'auto' ? todayStr() : document.getElementById('entry-date').value;
+
+  if (!date)            return toast('Select a date', 'error');
+  if (!liters || liters <= 0) return toast('Select or enter litres', 'error');
+  if (!price || price <= 0)   return toast('Enter price per litre', 'error');
+
+  const amount = parseFloat((liters * price).toFixed(2));
+
+  try {
+    await db.collection('milkEntries').add({
+      buyerPhone: currentBuyer.phone,
+      farmerPhone: currentFarmer.phone,
+      liters, pricePerLiter: price, amount, date,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    document.getElementById('entry-liters-select').value = '';
+    document.getElementById('entry-liters-custom').style.display = 'none';
+    document.getElementById('entry-liters-custom').value = '';
+    document.getElementById('entry-preview').style.display = 'none';
+
+    toast('Entry saved! ✅', 'success');
+    loadFarmerEntries();
+    calcBuyerTotals();
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════
+   LOAD FARMER ENTRIES
+═══════════════════════════ */
+async function loadFarmerEntries() {
+  const ctn = document.getElementById('entries-container');
+  ctn.innerHTML = '<div class="loading">Loading…</div>';
+
+  let entries = [];
+  try {
+    const snap = await db.collection('milkEntries')
+      .where('farmerPhone', '==', currentFarmer.phone)
+      .where('buyerPhone',  '==', currentBuyer.phone)
+      .get();
+    entries = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => b.date.localeCompare(a.date));
+  } catch(e) {
+    ctn.innerHTML = '<div class="empty-state"><p>Error loading entries.</p></div>';
+    return;
+  }
+
+  if (!entries.length) {
+    ctn.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>No entries yet.<br>Add the first one above.</p></div>';
+    document.getElementById('farmer-total-liters').textContent = '0 L';
+    document.getElementById('farmer-total-money').textContent  = '₹0';
+    return;
+  }
+
+  let tL = 0, tM = 0;
+  const rows = entries.map(e => {
+    tL += e.liters; tM += e.amount;
+    return `
+      <div class="entry-row">
+        <div class="entry-date">
+          ${fmtDate(e.date)}
+          <small>₹${e.pricePerLiter}/L</small>
+        </div>
+        <div class="entry-lit">${e.liters} L</div>
+        <div class="entry-amt">₹${e.amount.toFixed(0)}</div>
+        <button class="entry-del" onclick="deleteEntry('${e.id}')" title="Delete">🗑</button>
+      </div>`;
+  }).join('');
+
+  ctn.innerHTML = `<div class="card" style="padding:8px 12px;">${rows}</div>`;
+  document.getElementById('farmer-total-liters').textContent = tL.toFixed(1) + ' L';
+  document.getElementById('farmer-total-money').textContent  = '₹' + tM.toFixed(0);
+}
+
+/* ═══════════════════════════
+   DELETE ENTRY
+═══════════════════════════ */
+async function deleteEntry(id) {
+  if (!confirm('Delete this entry?')) return;
+  try {
+    await db.collection('milkEntries').doc(id).delete();
+    toast('Entry deleted', '');
+    loadFarmerEntries();
+    calcBuyerTotals();
+  } catch(e) {
+    toast('Could not delete: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════
+   SELLER: REGISTER
+═══════════════════════════ */
+async function registerSeller() {
+  const phone = document.getElementById('seller-reg-phone').value.trim();
+  const pin   = getPin('seller-reg-pin');
+
+  if (phone.length !== 10) return toast('Enter valid 10-digit phone number', 'error');
+  if (pin.length !== 4)    return toast('Enter all 4 PIN digits', 'error');
+
+  try {
+    // Verify this phone was registered by a buyer
+    const fDoc = await db.collection('farmers').doc(phone).get();
+    if (!fDoc.exists) {
+      return toast('Number not registered by any buyer. Contact your buyer.', 'error');
+    }
+
+    const sDoc = await db.collection('sellers').doc(phone).get();
+    if (sDoc.exists) return toast('Already registered. Please login.', 'error');
+
+    await db.collection('sellers').doc(phone).set({
+      phone, pin,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    toast('Registered! 🎉 Please login.', 'success');
+    clearPin('seller-reg-pin');
+    document.getElementById('seller-reg-phone').value = '';
+    setTimeout(() => goTo('page-seller-login'), 1200);
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════
+   SELLER: LOGIN
+═══════════════════════════ */
+async function loginSeller() {
+  const phone = document.getElementById('seller-login-phone').value.trim();
+  const pin   = getPin('seller-login-pin');
+
+  if (phone.length !== 10) return toast('Enter your 10-digit phone number', 'error');
+  if (pin.length !== 4)    return toast('Enter your 4-digit PIN', 'error');
+
+  try {
+    const doc = await db.collection('sellers').doc(phone).get();
+    if (!doc.exists)          return toast('Not registered. Please register first.', 'error');
+    if (doc.data().pin !== pin) return toast('Wrong PIN. Try again.', 'error');
+
+    currentSeller = { phone };
+    clearPin('seller-login-pin');
+    toast('Welcome! 🥛', 'success');
+    goTo('page-seller-dashboard');
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+function logoutSeller() {
+  currentSeller = null;
+  goTo('page-landing');
+}
+
+/* ═══════════════════════════
+   SELLER DASHBOARD
+═══════════════════════════ */
+async function loadSellerData() {
+  if (!currentSeller) return;
+
+  try {
+    const fDoc = await db.collection('farmers').doc(currentSeller.phone).get();
+    if (!fDoc.exists) return toast('Farmer details not found', 'error');
+
+    const farmer = fDoc.data();
+    const bDoc   = await db.collection('buyers').doc(farmer.buyerPhone).get();
+    const buyerName = bDoc.exists ? bDoc.data().name : farmer.buyerPhone;
+
+    document.getElementById('seller-name-display').textContent  = farmer.name;
+    document.getElementById('seller-phone-display').textContent = '📞 ' + farmer.phone;
+    document.getElementById('seller-price-display').textContent = '₹' + farmer.pricePerLiter + ' per litre';
+    document.getElementById('seller-buyer-display').textContent = 'Buyer: ' + buyerName;
+
+    const snap = await db.collection('milkEntries')
+      .where('farmerPhone', '==', currentSeller.phone).get();
+    const entries = snap.docs.map(d => d.data())
+      .sort((a, b) => b.date.localeCompare(a.date));
+
+    const ctn = document.getElementById('seller-entries-container');
+
+    if (!entries.length) {
+      ctn.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>No records yet.<br>Your buyer hasn\'t added any entries.</p></div>';
+      return;
+    }
+
+    let tL = 0, tM = 0;
+    const tableBody = entries.map(e => {
+      tL += e.liters; tM += e.amount;
+      return `<tr>
+        <td>${fmtDate(e.date)}</td>
+        <td><strong>${e.liters} L</strong></td>
+        <td>₹${e.pricePerLiter}</td>
+        <td class="amt-cell">₹${e.amount.toFixed(0)}</td>
+      </tr>`;
+    }).join('');
+
+    ctn.innerHTML = `
+      <div class="card" style="padding:0;overflow:hidden;border-radius:var(--radius);">
+        <table class="milk-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Litres</th><th>Rate</th><th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>${tableBody}</tbody>
+        </table>
+      </div>
+      <div class="card card-green" style="margin-top:12px;text-align:center;">
+        <div style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px;">Summary</div>
+        <div style="display:flex;justify-content:space-around;">
+          <div>
+            <div style="font-size:22px;font-weight:800;color:var(--green-800);font-family:'Nunito';">${tL.toFixed(1)} L</div>
+            <div style="font-size:11px;color:var(--text-muted);">Total Litres</div>
+          </div>
+          <div>
+            <div style="font-size:22px;font-weight:800;color:var(--green-800);font-family:'Nunito';">₹${tM.toFixed(0)}</div>
+            <div style="font-size:11px;color:var(--text-muted);">Total Earned</div>
+          </div>
+          <div>
+            <div style="font-size:22px;font-weight:800;color:var(--green-800);font-family:'Nunito';">${entries.length}</div>
+            <div style="font-size:11px;color:var(--text-muted);">Days</div>
+          </div>
+        </div>
+      </div>`;
+
+    document.getElementById('seller-total-liters').textContent = tL.toFixed(1) + ' L';
+    document.getElementById('seller-total-money').textContent  = '₹' + tM.toFixed(0);
+  } catch(e) {
+    toast('Error loading data: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════
+   REVIEW
+═══════════════════════════ */
+const RATING_LABELS = ['', '😞 Poor', '😐 Fair', '🙂 Good', '😊 Great', '🤩 Excellent!'];
+function setRating(n) {
+  selectedRating = n;
+  document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('active', i < n));
+  document.getElementById('rating-label').textContent = RATING_LABELS[n];
+}
+
+async function submitReview() {
+  if (!selectedRating) return toast('Please tap a star to rate', 'error');
+  const comment = document.getElementById('review-text').value.trim();
+  try {
+    await db.collection('reviews').add({
+      rating: selectedRating, comment,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) {}
+  toast('Thank you for your review! 🌟', 'success');
+  document.getElementById('review-text').value = '';
+  setRating(0);
+  setTimeout(() => goTo('page-landing'), 2000);
+}
+
+/* ═══════════════════════════
+   UTILS
+═══════════════════════════ */
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function fmtDate(str) {
+  if (!str) return '—';
+  const [y, m, d] = str.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return d + ' ' + months[parseInt(m) - 1] + ' ' + y;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ═══════════════════════════
+   INIT
+═══════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  setupPins('buyer-reg-pin');
+  setupPins('buyer-login-pin');
+  setupPins('seller-reg-pin');
+  setupPins('seller-login-pin');
+
+  document.getElementById('entry-price').addEventListener('input', updatePreview);
+  document.getElementById('entry-liters-custom').addEventListener('input', updatePreview);
+
+  // Close modal on backdrop click
+  document.getElementById('modal-add-farmer').addEventListener('click', function(e) {
+    if (e.target === this) closeModal('modal-add-farmer');
+  });
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('SW registered'))
+      .catch(e => console.log('SW error:', e));
+  }
+});
+</script>
+</body>
+</html>
