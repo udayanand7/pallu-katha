@@ -590,6 +590,39 @@
       margin-top: 8px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── LANGUAGE TOGGLE ─── */
+    .lang-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1.5px solid rgba(255,255,255,0.4);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .lang-btn:active { transform: scale(0.93); }
+    .lang-fab {
+      position: fixed;
+      top: 14px;
+      right: 16px;
+      background: rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255,255,255,0.4);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      z-index: 500;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -623,30 +656,34 @@
       <div style="font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;color:var(--green-900);line-height:1.1;">పాలు ఖాతా</div>
       <div style="font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Digital Dairy Account</div>
     </div>
+    <button onclick="toggleLang()" id="lang-btn-landing"
+      style="margin-left:auto;background:var(--green-800);border:none;color:white;font-size:12px;font-weight:800;padding:6px 14px;border-radius:20px;cursor:pointer;font-family:'Nunito',sans-serif;">
+      EN / తె
+    </button>
   </div>
 
   <div class="role-section">
-    <h2>Choose your role</h2>
+    <h2 id="lnd-choose-role">Choose your role</h2>
     <button class="role-btn" onclick="goTo('page-buyer-auth')">
       <div class="role-icon buyer">🛒</div>
       <div class="role-text">
-        <h3>Buyer</h3>
-        <p>Collect &amp; manage milk from farmers</p>
+        <h3 id="lnd-buyer-title">Buyer</h3>
+        <p id="lnd-buyer-sub">Collect &amp; manage milk from farmers</p>
       </div>
       <span class="role-arrow">›</span>
     </button>
     <button class="role-btn" onclick="goTo('page-seller-auth')">
       <div class="role-icon seller">🐄</div>
       <div class="role-text">
-        <h3>Farmer / Seller</h3>
-        <p>View your daily milk &amp; payments</p>
+        <h3 id="lnd-farmer-title">Farmer / Seller</h3>
+        <p id="lnd-farmer-sub">View your daily milk &amp; payments</p>
       </div>
       <span class="role-arrow">›</span>
     </button>
   </div>
 
   <div class="install-box">
-    <h3>📲 Add to Home Screen</h3>
+    <h3 id="lnd-install-title">📲 Add to Home Screen</h3>
     <div class="install-step">
       <div class="step-num">A</div>
       <div><strong>iPhone (Safari):</strong> Tap the Share button (□↑) at the bottom → tap <em>"Add to Home Screen"</em> → tap <em>Add</em></div>
@@ -662,7 +699,7 @@
   </div>
 
   <div class="review-link">
-    <button onclick="goTo('page-review')">⭐ Leave a Review</button>
+    <button id="lnd-review-btn" onclick="goTo('page-review')">⭐ Leave a Review</button>
   </div>
 </div>
 
@@ -672,13 +709,13 @@
 <div id="page-buyer-auth" class="page">
   <div class="auth-hero">
     <img src="logo.jpeg" alt="Logo" style="width:80px;height:80px;border-radius:20px;object-fit:cover;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-    <h2>Buyer Account</h2>
-    <p>Track milk collection from your farmers</p>
+    <h2 id="auth-buyer-title">Buyer Account</h2>
+    <p id="auth-buyer-sub">Track milk collection from your farmers</p>
   </div>
   <div class="auth-btns">
-    <button class="btn btn-primary" onclick="goTo('page-buyer-register')">📝 &nbsp; Create Account</button>
-    <button class="btn btn-secondary" onclick="goTo('page-buyer-login')">🔐 &nbsp; Login</button>
-    <button class="btn-ghost btn" onclick="goTo('page-landing')">← Back to Home</button>
+    <button id="auth-buyer-create" class="btn btn-primary" onclick="goTo('page-buyer-register')">📝 &nbsp; Create Account</button>
+    <button id="auth-buyer-login" class="btn btn-secondary" onclick="goTo('page-buyer-login')">🔐 &nbsp; Login</button>
+    <button id="auth-buyer-back" class="btn-ghost btn" onclick="goTo('page-landing')">← Back to Home</button>
   </div>
 </div>
 
@@ -688,15 +725,19 @@
 <div id="page-buyer-register" class="page">
   <div class="header">
     <button class="back-btn" onclick="goTo('page-buyer-auth')">‹</button>
-    <h1>Create Buyer Account</h1>
+    <h1 id="reg-buyer-hdr">Create Buyer Account</h1>
   </div>
   <div class="content">
     <div class="card card-green" style="margin-bottom:18px;">
-      <div style="font-size:13px;color:var(--green-900);">📋 Register as a milk buyer to track daily milk collection from your farmers.</div>
+      <div style="font-size:13px;color:var(--green-900);"><span id="reg-buyer-info">📋 Register as a milk buyer to track daily milk collection from your farmers.</span></div>
     </div>
     <div class="form-group">
       <label>Your Full Name</label>
       <input type="text" id="buyer-reg-name" placeholder="e.g. Suresh Kumar" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label id="reg-buyer-village-lbl">Village / Place Name</label>
+      <input type="text" id="buyer-reg-village" placeholder="e.g. Ramapuram, Nalgonda">
     </div>
     <div class="form-group">
       <label>Phone Number</label>
@@ -706,7 +747,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label>Create 4-Digit PIN</label>
+      <label id="reg-buyer-pin-lbl">Create 4-Digit PIN</label>
       <div class="pin-row">
         <input type="password" class="pin-cell buyer-reg-pin" maxlength="1" inputmode="numeric">
         <input type="password" class="pin-cell buyer-reg-pin" maxlength="1" inputmode="numeric">
@@ -714,9 +755,9 @@
         <input type="password" class="pin-cell buyer-reg-pin" maxlength="1" inputmode="numeric">
       </div>
     </div>
-    <button class="btn btn-primary mt-12" onclick="registerBuyer()">Create Account →</button>
+    <button id="reg-buyer-btn" class="btn btn-primary mt-12" onclick="registerBuyer()">Create Account →</button>
     <div class="text-center mt-12">
-      <button onclick="goTo('page-buyer-login')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">Already have an account? Login</button>
+      <button id="reg-buyer-login-link" onclick="goTo('page-buyer-login')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">Already have an account? Login</button>
     </div>
   </div>
 </div>
@@ -727,7 +768,7 @@
 <div id="page-buyer-login" class="page">
   <div class="header">
     <button class="back-btn" onclick="goTo('page-buyer-auth')">‹</button>
-    <h1>Buyer Login</h1>
+    <h1 id="login-buyer-hdr">Buyer Login</h1>
   </div>
   <div class="content">
     <div class="form-group">
@@ -738,7 +779,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label>4-Digit PIN</label>
+      <label id="login-buyer-pin-lbl">4-Digit PIN</label>
       <div class="pin-row">
         <input type="password" class="pin-cell buyer-login-pin" maxlength="1" inputmode="numeric">
         <input type="password" class="pin-cell buyer-login-pin" maxlength="1" inputmode="numeric">
@@ -748,11 +789,11 @@
     </div>
     <div class="remember-row">
       <input type="checkbox" id="buyer-remember" checked>
-      <label for="buyer-remember">Remember my phone &amp; PIN (auto-fill next time)</label>
+      <label id="remember-buyer-lbl" for="buyer-remember">Remember my phone &amp; PIN (auto-fill next time)</label>
     </div>
-    <button class="btn btn-primary" onclick="loginBuyer()">Login →</button>
+    <button id="login-buyer-btn" class="btn btn-primary" onclick="loginBuyer()">Login →</button>
     <div class="text-center mt-12">
-      <button onclick="goTo('page-buyer-register')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">New here? Create an account</button>
+      <button id="login-buyer-reg-link" onclick="goTo('page-buyer-register')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">New here? Create an account</button>
     </div>
   </div>
 </div>
@@ -764,7 +805,8 @@
   <div class="header">
     <img src="logo.jpeg" alt="Logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover;">
     <h1 id="buyer-greeting">పాలు ఖాతా</h1>
-    <button class="logout-btn" onclick="logoutBuyer()">Logout</button>
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn-buyer">EN/తె</button>
+    <button class="logout-btn" onclick="logoutBuyer()" id="btn-logout-buyer">Logout</button>
   </div>
 
   <!-- Search bar (inside green header area) -->
@@ -784,15 +826,15 @@
   <div class="total-bar" id="buyer-total-bar">
     <div class="total-item">
       <span class="stat-val" id="total-liters-display">0 L</span>
-      <div class="stat-lbl">Total Litres</div>
+      <div class="stat-lbl" id="lbl-total-litres">Total Litres</div>
     </div>
     <div class="total-item">
       <span class="stat-val" id="total-money-display">₹0</span>
-      <div class="stat-lbl">Total Money</div>
+      <div class="stat-lbl" id="lbl-total-money">Total Money</div>
     </div>
     <div class="total-item">
       <span class="stat-val" id="total-farmers-display">0</span>
-      <div class="stat-lbl">Farmers</div>
+      <div class="stat-lbl" id="lbl-total-farmers">Farmers</div>
     </div>
   </div>
 
@@ -804,12 +846,16 @@
 <div id="modal-add-farmer" class="modal-overlay">
   <div class="modal-sheet">
     <div class="modal-title">
-      <h3>➕ Add New Farmer</h3>
+      <h3 id="modal-add-farmer-title">➕ Add New Farmer</h3>
       <button class="modal-close" onclick="closeModal('modal-add-farmer')">×</button>
     </div>
     <div class="form-group">
       <label>Farmer's Name</label>
       <input type="text" id="add-farmer-name" placeholder="Full name">
+    </div>
+    <div class="form-group">
+      <label id="modal-village-lbl">Village / Place Name</label>
+      <input type="text" id="add-farmer-village" placeholder="e.g. Suryapet, Khammam">
     </div>
     <div class="form-group">
       <label>Farmer's Phone Number</label>
@@ -822,7 +868,7 @@
       <label>Price Per Litre (₹)</label>
       <input type="number" id="add-farmer-price" placeholder="e.g. 32" min="1" max="999" inputmode="numeric">
     </div>
-    <button class="btn btn-primary" onclick="addFarmer()">✓ Add Farmer</button>
+    <button id="btn-add-farmer" class="btn btn-primary" onclick="addFarmer()">✓ Add Farmer</button>
   </div>
 </div>
 
@@ -834,24 +880,25 @@
     <button class="back-btn" onclick="goTo('page-buyer-dashboard')">‹</button>
     <h1 id="farmer-detail-name">Farmer</h1>
     <span id="farmer-detail-price-badge" style="font-size:13px;opacity:0.9;font-family:'Nunito';font-weight:700;"></span>
+    <button class="lang-btn" onclick="toggleLang()">EN/తె</button>
   </div>
 
   <div class="content">
     <!-- Add Entry Card -->
     <div class="card" style="margin-bottom:16px;">
-      <div class="section-title">📋 Add Milk Entry</div>
+      <div id="fd-add-entry-title" class="section-title">📋 Add Milk Entry</div>
 
       <div class="form-group">
-        <label>Date</label>
+        <label id="fd-date-label">Date</label>
         <div class="date-toggle">
-          <button id="btn-date-auto" class="active" onclick="setDateMode('auto')">🗓 Auto (Today)</button>
-          <button id="btn-date-manual" onclick="setDateMode('manual')">✏️ Manual</button>
+          <button id="fd-date-auto-btn" class="active" onclick="setDateMode('auto')">🗓 Auto (Today)</button>
+          <button id="fd-date-manual-btn" onclick="setDateMode('manual')">✏️ Manual</button>
         </div>
         <input type="date" id="entry-date" style="display:none;">
       </div>
 
       <div class="form-group">
-        <label>Litres Collected</label>
+        <label id="fd-litres-label">Litres Collected</label>
         <div style="display:flex;gap:8px;">
           <select id="entry-liters-select" onchange="onLiterChange()" style="flex:1;">
             <option value="">— Select Litres —</option>
@@ -879,23 +926,23 @@
       </div>
 
       <div class="form-group">
-        <label>Price Per Litre (₹)</label>
+        <label id="fd-price-label">Price Per Litre (₹)</label>
         <input type="number" id="entry-price" placeholder="₹ per litre" min="1" inputmode="numeric" oninput="updatePreview()">
       </div>
 
       <div class="preview-box" id="entry-preview">
-        <div class="lbl">Amount to Pay</div>
+        <div id="fd-preview-label" class="lbl">Amount to Pay</div>
         <div class="val" id="preview-amount">₹0</div>
       </div>
 
-      <button class="btn btn-primary" onclick="addMilkEntry()">✓ Save Entry</button>
+      <button id="fd-save-btn" class="btn btn-primary" onclick="addMilkEntry()">✓ Save Entry</button>
     </div>
 
     <!-- Notification banner -->
     <div class="notif-banner" id="notif-banner" style="display:none;">
       <span style="font-size:20px;">🔔</span>
-      <p>Enable notifications to alert farmer when new entry is added!</p>
-      <button onclick="requestNotifPermission()">Enable</button>
+      <p id="notif-text">Enable notifications to alert farmer when new entry is added!</p>
+      <button id="notif-enable-btn" onclick="requestNotifPermission()">Enable</button>
     </div>
 
     <!-- Monthly Paid/Unpaid Section -->
@@ -905,7 +952,7 @@
     </div>
 
     <!-- History -->
-    <div class="section-title">📅 Entry History</div>
+    <div id="fd-history-title" class="section-title">📅 Entry History</div>
     <div id="entries-container">
       <div class="loading">Loading entries…</div>
     </div>
@@ -918,7 +965,7 @@
     </div>
     <div class="total-item">
       <span class="stat-val" id="farmer-total-money">₹0</span>
-      <div class="stat-lbl">Total Amount</div>
+      <div class="stat-lbl" id="fd-total-money-lbl">Total Amount</div>
     </div>
   </div>
 </div>
@@ -929,13 +976,13 @@
 <div id="page-seller-auth" class="page">
   <div class="auth-hero" style="background:linear-gradient(145deg,#1a3d20,#2d7a3a);">
     <img src="logo.jpeg" alt="Logo" style="width:80px;height:80px;border-radius:20px;object-fit:cover;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-    <h2>Farmer / Seller</h2>
-    <p>View your milk sales &amp; daily payments</p>
+    <h2 id="auth-seller-title">Farmer / Seller</h2>
+    <p id="auth-seller-sub">View your milk sales &amp; daily payments</p>
   </div>
   <div class="auth-btns">
-    <button class="btn btn-primary" onclick="goTo('page-seller-register')">📝 &nbsp; Register</button>
-    <button class="btn btn-secondary" onclick="goTo('page-seller-login')">🔐 &nbsp; Login</button>
-    <button class="btn-ghost btn" onclick="goTo('page-landing')">← Back to Home</button>
+    <button id="auth-seller-create" class="btn btn-primary" onclick="goTo('page-seller-register')">📝 &nbsp; Register</button>
+    <button id="auth-seller-login" class="btn btn-secondary" onclick="goTo('page-seller-login')">🔐 &nbsp; Login</button>
+    <button id="auth-seller-back" class="btn-ghost btn" onclick="goTo('page-landing')">← Back to Home</button>
   </div>
 </div>
 
@@ -945,12 +992,12 @@
 <div id="page-seller-register" class="page">
   <div class="header">
     <button class="back-btn" onclick="goTo('page-seller-auth')">‹</button>
-    <h1>Farmer Register</h1>
+    <h1 id="reg-seller-hdr">Farmer Register</h1>
   </div>
   <div class="content">
     <div class="card card-green" style="margin-bottom:16px;">
       <div style="font-size:13px;color:var(--green-900);line-height:1.6;">
-        🔒 <strong>Only number given by buyer</strong> can register here
+        <span id="reg-seller-info">🔒 <strong>Only number given by buyer</strong> can register here</span>
       </div>
     </div>
     <div class="form-group">
@@ -961,7 +1008,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label>Create 4-Digit PIN</label>
+      <label id="reg-seller-pin-lbl">Create 4-Digit PIN</label>
       <div class="pin-row">
         <input type="password" class="pin-cell seller-reg-pin" maxlength="1" inputmode="numeric">
         <input type="password" class="pin-cell seller-reg-pin" maxlength="1" inputmode="numeric">
@@ -969,10 +1016,8 @@
         <input type="password" class="pin-cell seller-reg-pin" maxlength="1" inputmode="numeric">
       </div>
     </div>
-    <button class="btn btn-primary mt-12" onclick="registerSeller()">Register →</button>
-    <div class="text-center mt-16" style="font-size:12px;color:var(--text-muted);padding:0 8px;line-height:1.6;">
-      Only the number given to buyer will work here
-    </div>
+    <button id="reg-seller-btn" class="btn btn-primary mt-12" onclick="registerSeller()">Register →</button>
+    <div id="reg-seller-note" class="text-center mt-16" style="font-size:12px;color:var(--text-muted);padding:0 8px;line-height:1.6;">Only the number given to buyer will work here</div>
   </div>
 </div>
 
@@ -982,7 +1027,7 @@
 <div id="page-seller-login" class="page">
   <div class="header">
     <button class="back-btn" onclick="goTo('page-seller-auth')">‹</button>
-    <h1>Farmer Login</h1>
+    <h1 id="login-seller-hdr">Farmer Login</h1>
   </div>
   <div class="content">
     <div class="form-group">
@@ -993,7 +1038,7 @@
       </div>
     </div>
     <div class="form-group">
-      <label>4-Digit PIN</label>
+      <label id="login-seller-pin-lbl">4-Digit PIN</label>
       <div class="pin-row">
         <input type="password" class="pin-cell seller-login-pin" maxlength="1" inputmode="numeric">
         <input type="password" class="pin-cell seller-login-pin" maxlength="1" inputmode="numeric">
@@ -1003,11 +1048,11 @@
     </div>
     <div class="remember-row">
       <input type="checkbox" id="seller-remember" checked>
-      <label for="seller-remember">Remember my phone &amp; PIN (auto-fill next time)</label>
+      <label id="remember-seller-lbl" for="seller-remember">Remember my phone &amp; PIN (auto-fill next time)</label>
     </div>
-    <button class="btn btn-primary" onclick="loginSeller()">Login →</button>
+    <button id="login-seller-btn" class="btn btn-primary" onclick="loginSeller()">Login →</button>
     <div class="text-center mt-12">
-      <button onclick="goTo('page-seller-register')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">New? Register first</button>
+      <button id="login-seller-reg-link" onclick="goTo('page-seller-register')" style="background:none;border:none;color:var(--green-700);font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;">New? Register first</button>
     </div>
   </div>
 </div>
@@ -1018,13 +1063,14 @@
 <div id="page-seller-dashboard" class="page">
   <div class="header">
     <img src="logo.jpeg" alt="Logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover;">
-    <h1>My Milk Records</h1>
-    <button class="logout-btn" onclick="logoutSeller()">Logout</button>
+    <h1 id="hdr-seller-title">My Milk Records</h1>
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn-seller">EN/తె</button>
+    <button class="logout-btn" onclick="logoutSeller()" id="btn-logout-seller">Logout</button>
   </div>
 
   <div class="content">
     <!-- View-only badge -->
-    <div class="view-only-badge">👀 View Only — Your buyer manages all entries</div>
+    <div id="seller-view-only" class="view-only-badge">👀 View Only — Your buyer manages all entries</div>
 
     <!-- Farmer info card -->
     <div class="card card-green" style="margin-bottom:16px;">
@@ -1036,7 +1082,7 @@
       </div>
     </div>
 
-    <div class="section-title">📅 Daily Records</div>
+    <div id="seller-daily-title" class="section-title">📅 Daily Records</div>
     <div id="seller-entries-container">
       <div class="loading">Loading records…</div>
     </div>
@@ -1049,7 +1095,7 @@
     </div>
     <div class="total-item">
       <span class="stat-val" id="seller-total-money">₹0</span>
-      <div class="stat-lbl">Total Earned</div>
+      <div id="lbl-seller-total-earned" class="stat-lbl">Total Earned</div>
     </div>
   </div>
 </div>
@@ -1060,13 +1106,13 @@
 <div id="page-review" class="page">
   <div class="review-hero">
     <img src="logo.jpeg" alt="Logo" style="width:80px;height:80px;border-radius:20px;object-fit:cover;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-    <h2>Rate పాలు ఖాతా</h2>
-    <p>Help us improve with your feedback</p>
+    <h2 id="review-title">Rate పాలు ఖాతా</h2>
+    <p id="review-sub">Help us improve with your feedback</p>
   </div>
   <div class="content">
     <div class="card" style="margin-top:4px;">
       <div style="text-align:center;">
-        <div style="font-size:15px;font-weight:700;color:var(--text-soft);margin-bottom:4px;">How was your experience?</div>
+        <div id="review-how" style="font-size:15px;font-weight:700;color:var(--text-soft);margin-bottom:4px;">How was your experience?</div>
         <div class="stars">
           <span class="star" onclick="setRating(1)">⭐</span>
           <span class="star" onclick="setRating(2)">⭐</span>
@@ -1080,11 +1126,11 @@
         <label>Your Comments (Optional)</label>
         <textarea id="review-text" rows="4" placeholder="What do you like? What can we improve?"></textarea>
       </div>
-      <button class="btn btn-primary" onclick="submitReview()">Submit Review 🚀</button>
+      <button id="review-submit" class="btn btn-primary" onclick="submitReview()">Submit Review 🚀</button>
     </div>
   </div>
   <div class="review-link">
-    <button onclick="goTo('page-landing')">← Back to Home</button>
+    <button id="review-back" onclick="goTo('page-landing')">← Back to Home</button>
   </div>
 </div>
 
@@ -1095,6 +1141,413 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+
+/* ══════════════════════════════════════════════════════
+   🌐 MULTI-LANGUAGE — ENGLISH & TELUGU
+══════════════════════════════════════════════════════ */
+let currentLang = 'en';
+
+const T = {
+  en: {
+    // Village
+    villageName:      'Village / Place Name',
+    villagePH:        'e.g. Ramapuram, Nalgonda',
+    farmerVillagePH:  'e.g. Suryapet, Khammam',
+    // Landing
+    chooseRole:       'Choose your role',
+    buyerTitle:       'Buyer',
+    buyerSub:         'Collect & manage milk from farmers',
+    farmerTitle:      'Farmer / Seller',
+    farmerSub:        'View your daily milk & payments',
+    addHomeTitle:     '📲 Add to Home Screen',
+    leaveReview:      '⭐ Leave a Review',
+    // Auth
+    buyerAccount:     'Buyer Account',
+    buyerAccountSub:  'Track milk collection from your farmers',
+    createAccount:    '📝  Create Account',
+    login:            '🔐  Login',
+    backHome:         '← Back to Home',
+    farmerAccount:    'Farmer / Seller',
+    farmerAccountSub: 'View your milk sales & daily payments',
+    // Register
+    createBuyerAcc:   'Create Buyer Account',
+    fullName:         'Your Full Name',
+    namePlaceholder:  'e.g. Suresh Kumar',
+    phoneNumber:      'Phone Number',
+    phonePlaceholder: '10-digit number',
+    create4pin:       'Create 4-Digit PIN',
+    createAccountBtn: 'Create Account →',
+    alreadyHaveAcc:   'Already have an account? Login',
+    registerInfo:     '<span id="reg-buyer-info">📋 Register as a milk buyer to track daily milk collection from your farmers.</span>',
+    // Login
+    buyerLogin:       'Buyer Login',
+    pin4digit:        '4-Digit PIN',
+    loginBtn:         'Login →',
+    newHere:          'New here? Create an account',
+    rememberMe:       'Remember my phone & PIN (auto-fill next time)',
+    // Buyer Dashboard
+    searchPlaceholder:'Search by name or phone…',
+    totalLitres:      'Total Litres',
+    totalMoney:       'Total Money',
+    farmers:          'Farmers',
+    loadingFarmers:   'Loading farmers…',
+    noFarmers:        'No farmers added yet.
+Tap + to add your first farmer.',
+    // Add Farmer Modal
+    addNewFarmer:     '➕ Add New Farmer',
+    farmerName:       "Farmer's Name",
+    farmerNamePH:     'Full name',
+    farmerPhone:      "Farmer's Phone Number",
+    farmerPhonePH:    '10-digit (give to farmer)',
+    pricePerLitre:    'Price Per Litre (₹)',
+    pricePH:          'e.g. 32',
+    addFarmerBtn:     '✓ Add Farmer',
+    // Farmer Detail
+    addMilkEntry:     '📋 Add Milk Entry',
+    date:             'Date',
+    autoToday:        '🗓 Auto (Today)',
+    manual:           '✏️ Manual',
+    litresCollected:  'Litres Collected',
+    selectLitres:     '— Select Litres —',
+    pricePerL:        'Price Per Litre (₹)',
+    amountToPay:      'Amount to Pay',
+    saveEntry:        '✓ Save Entry',
+    entryHistory:     '📅 Entry History',
+    loadingEntries:   'Loading entries…',
+    noEntries:        'No entries yet.
+Add the first one above.',
+    totalAmount:      'Total Amount',
+    // Monthly Payment
+    monthlyPayment:   '💰 Monthly Payment Status',
+    paid:             '✅ Paid',
+    unpaid:           '⏳ Unpaid',
+    // Seller
+    farmerRegister:   'Farmer Register',
+    onlyBuyerNumber:  '🔒 Only number given by buyer can register here',
+    yourPhone:        'Your Phone Number',
+    yourPhonePH:      'Number given to buyer',
+    registerBtn:      'Register →',
+    onlyWillWork:     'Only the number given to buyer will work here',
+    farmerLogin:      'Farmer Login',
+    newRegFirst:      'New? Register first',
+    myMilkRecords:    'My Milk Records',
+    viewOnly:         '👀 View Only — Your buyer manages all entries',
+    dailyRecords:     '📅 Daily Records',
+    totalLitresS:     'Total Litres',
+    totalEarned:      'Total Earned',
+    logoutBtn:        'Logout',
+    // Review
+    rateMilkBook:     'Rate పాలు ఖాతా',
+    rateSub:          'Help us improve with your feedback',
+    howWasExp:        'How was your experience?',
+    commentsLabel:    'Your Comments (Optional)',
+    commentsPH:       'What do you like? What can we improve?',
+    submitReview:     'Submit Review 🚀',
+    backToHome:       '← Back to Home',
+    // Summary
+    summary:          'Summary',
+    days:             'Days',
+    // Notif
+    enableNotif:      'Enable notifications to alert farmer when new entry is added!',
+    enableBtn:        'Enable',
+    // Date
+    selectDate:       'Select a date',
+    // Errors
+    enterName:        'Please enter your name',
+    validPhone:       'Enter valid 10-digit phone number',
+    allPin:           'Enter all 4 PIN digits',
+    alreadyReg:       'Phone already registered. Please login.',
+    notRegistered:    'Phone number not registered',
+    wrongPin:         'Wrong PIN. Try again.',
+    enterFarmerName:  'Enter farmer name',
+    enterPrice:       'Enter valid price per litre',
+    farmerAdded:      'Farmer already added',
+    selectLitresErr:  'Select or enter litres',
+    enterPriceErr:    'Enter price per litre',
+    notRegBuyer:      'Number not registered by any buyer. Contact your buyer.',
+    alreadyRegLogin:  'Already registered. Please login.',
+    notRegFirst:      'Not registered. Please register first.',
+    rateStar:         'Please tap a star to rate',
+  },
+
+  te: {
+    // Village
+    villageName:      'Village / Place Name',
+    villagePH:        'e.g. Ramapuram, Nalgonda',
+    farmerVillagePH:  'e.g. Suryapet, Khammam',
+    // Village
+    villageName:      'గ్రామం / ప్రదేశం పేరు',
+    villagePH:        'ఉదా. రామాపురం, నల్గొండ',
+    farmerVillagePH:  'ఉదా. సూర్యాపేట, ఖమ్మం',
+    // Landing
+    chooseRole:       'మీ పాత్ర ఎంచుకోండి',
+    buyerTitle:       'కొనుగోలుదారు',
+    buyerSub:         'రైతుల నుండి పాలు సేకరించండి',
+    farmerTitle:      'రైతు / విక్రేత',
+    farmerSub:        'మీ రోజువారీ పాలు & చెల్లింపులు చూడండి',
+    addHomeTitle:     '📲 హోమ్ స్క్రీన్‌కు జోడించండి',
+    leaveReview:      '⭐ సమీక్ష ఇవ్వండి',
+    // Auth
+    buyerAccount:     'కొనుగోలుదారు ఖాతా',
+    buyerAccountSub:  'రైతుల నుండి పాల సేకరణ ట్రాక్ చేయండి',
+    createAccount:    '📝  ఖాతా తయారు చేయండి',
+    login:            '🔐  లాగిన్',
+    backHome:         '← వెనక్కి వెళ్ళండి',
+    farmerAccount:    'రైతు / విక్రేత',
+    farmerAccountSub: 'మీ పాల అమ్మకాలు & చెల్లింపులు చూడండి',
+    // Register
+    createBuyerAcc:   'కొనుగోలుదారు ఖాతా తయారు చేయండి',
+    fullName:         'మీ పూర్తి పేరు',
+    namePlaceholder:  'ఉదా. సురేష్ కుమార్',
+    phoneNumber:      'ఫోన్ నంబర్',
+    phonePlaceholder: '10 అంకెల నంబర్',
+    create4pin:       '4 అంకెల PIN తయారు చేయండి',
+    createAccountBtn: 'ఖాతా తయారు చేయండి →',
+    alreadyHaveAcc:   'ఇప్పటికే ఖాతా ఉందా? లాగిన్ చేయండి',
+    registerInfo:     '📋 కొనుగోలుదారుగా నమోదు చేసుకోండి మరియు రైతుల నుండి రోజువారీ పాల సేకరణ ట్రాక్ చేయండి.',
+    // Login
+    buyerLogin:       'కొనుగోలుదారు లాగిన్',
+    pin4digit:        '4 అంకెల PIN',
+    loginBtn:         'లాగిన్ →',
+    newHere:          'కొత్తగా వచ్చారా? ఖాతా తయారు చేయండి',
+    rememberMe:       'ఫోన్ & PIN గుర్తుంచుకో (తర్వాత అటోమేటిక్)',
+    // Buyer Dashboard
+    searchPlaceholder:'పేరు లేదా ఫోన్ ద్వారా వెతకండి…',
+    totalLitres:      'మొత్తం లీటర్లు',
+    totalMoney:       'మొత్తం డబ్బు',
+    farmers:          'రైతులు',
+    loadingFarmers:   'రైతులు లోడ్ అవుతున్నారు…',
+    noFarmers:        'ఇంకా రైతులు జోడించబడలేదు.
++ నొక్కి మొదటి రైతుని జోడించండి.',
+    // Add Farmer Modal
+    addNewFarmer:     '➕ కొత్త రైతు జోడించండి',
+    farmerName:       'రైతు పేరు',
+    farmerNamePH:     'పూర్తి పేరు',
+    farmerPhone:      'రైతు ఫోన్ నంబర్',
+    farmerPhonePH:    '10 అంకెలు (రైతుకు ఇవ్వండి)',
+    pricePerLitre:    'లీటరుకు ధర (₹)',
+    pricePH:          'ఉదా. 32',
+    addFarmerBtn:     '✓ రైతు జోడించండి',
+    // Farmer Detail
+    addMilkEntry:     '📋 పాల ఎంట్రీ జోడించండి',
+    date:             'తేదీ',
+    autoToday:        '🗓 ఆటో (ఈ రోజు)',
+    manual:           '✏️ మాన్యువల్',
+    litresCollected:  'సేకరించిన లీటర్లు',
+    selectLitres:     '— లీటర్లు ఎంచుకోండి —',
+    pricePerL:        'లీటరుకు ధర (₹)',
+    amountToPay:      'చెల్లించాల్సిన మొత్తం',
+    saveEntry:        '✓ ఎంట్రీ సేవ్ చేయండి',
+    entryHistory:     '📅 ఎంట్రీ చరిత్ర',
+    loadingEntries:   'లోడ్ అవుతోంది…',
+    noEntries:        'ఇంకా ఎంట్రీలు లేవు.
+పైన మొదటిది జోడించండి.',
+    totalAmount:      'మొత్తం రకం',
+    // Monthly Payment
+    monthlyPayment:   '💰 నెలవారీ చెల్లింపు స్థితి',
+    paid:             '✅ చెల్లించారు',
+    unpaid:           '⏳ చెల్లించలేదు',
+    // Seller
+    farmerRegister:   'రైతు నమోదు',
+    onlyBuyerNumber:  '🔒 కొనుగోలుదారు ఇచ్చిన నంబర్ మాత్రమే నమోదు చేయవచ్చు',
+    yourPhone:        'మీ ఫోన్ నంబర్',
+    yourPhonePH:      'కొనుగోలుదారుకు ఇచ్చిన నంబర్',
+    registerBtn:      'నమోదు చేయండి →',
+    onlyWillWork:     'కొనుగోలుదారుకు ఇచ్చిన నంబర్ మాత్రమే పని చేస్తుంది',
+    farmerLogin:      'రైతు లాగిన్',
+    newRegFirst:      'కొత్తగా వచ్చారా? ముందు నమోదు చేయండి',
+    myMilkRecords:    'నా పాల రికార్డులు',
+    viewOnly:         '👀 చూడడానికి మాత్రమే — మీ కొనుగోలుదారు మేనేజ్ చేస్తాడు',
+    dailyRecords:     '📅 రోజువారీ రికార్డులు',
+    totalLitresS:     'మొత్తం లీటర్లు',
+    totalEarned:      'మొత్తం సంపాదన',
+    logoutBtn:        'లాగ్అవుట్',
+    // Review
+    rateMilkBook:     'పాలు ఖాతా రేట్ చేయండి',
+    rateSub:          'మీ అభిప్రాయంతో మెరుగుపరచుకోవడానికి సహాయం చేయండి',
+    howWasExp:        'మీ అనుభవం ఎలా ఉంది?',
+    commentsLabel:    'మీ వ్యాఖ్యలు (ఐచ్ఛికం)',
+    commentsPH:       'మీకు ఏం నచ్చింది? ఏం మెరుగుపరచాలి?',
+    submitReview:     'సమీక్ష సమర్పించండి 🚀',
+    backToHome:       '← హోమ్‌కు వెళ్ళండి',
+    // Summary
+    summary:          'సారాంశం',
+    days:             'రోజులు',
+    // Notif
+    enableNotif:      'కొత్త ఎంట్రీ జోడించినప్పుడు రైతుకు అలర్ట్ పంపడానికి నోటిఫికేషన్లు ఆన్ చేయండి!',
+    enableBtn:        'ఆన్ చేయండి',
+    // Date
+    selectDate:       'తేదీ ఎంచుకోండి',
+    // Errors
+    enterName:        'దయచేసి మీ పేరు నమోదు చేయండి',
+    validPhone:       'సరైన 10 అంకెల ఫోన్ నంబర్ నమోదు చేయండి',
+    allPin:           '4 అంకెల PIN నమోదు చేయండి',
+    alreadyReg:       'ఫోన్ ఇప్పటికే నమోదు చేయబడింది. లాగిన్ చేయండి.',
+    notRegistered:    'ఫోన్ నంబర్ నమోదు కాలేదు',
+    wrongPin:         'తప్పు PIN. మళ్ళీ ప్రయత్నించండి.',
+    enterFarmerName:  'రైతు పేరు నమోదు చేయండి',
+    enterPrice:       'సరైన లీటరు ధర నమోదు చేయండి',
+    farmerAdded:      'రైతు ఇప్పటికే జోడించబడ్డాడు',
+    selectLitresErr:  'లీటర్లు ఎంచుకోండి లేదా నమోదు చేయండి',
+    enterPriceErr:    'లీటరుకు ధర నమోదు చేయండి',
+    notRegBuyer:      'ఏ కొనుగోలుదారు ద్వారా నమోదు కాలేదు. మీ కొనుగోలుదారుని సంప్రదించండి.',
+    alreadyRegLogin:  'ఇప్పటికే నమోదు చేయబడింది. లాగిన్ చేయండి.',
+    notRegFirst:      'నమోదు కాలేదు. ముందు నమోదు చేయండి.',
+    rateStar:         'దయచేసి నక్షత్రాన్ని నొక్కి రేట్ చేయండి',
+  }
+};
+
+// Shortcut: get translation
+function t(key) {
+  return (T[currentLang] && T[currentLang][key]) ? T[currentLang][key] : (T['en'][key] || key);
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'en' ? 'te' : 'en';
+  try { localStorage.setItem('pk_lang', currentLang); } catch(e) {}
+  applyLanguage();
+}
+
+function applyLanguage() {
+  const isTE = currentLang === 'te';
+  const btnLabel = isTE ? 'EN' : 'తె';
+
+  // Update all lang buttons label
+  document.querySelectorAll('.lang-btn, #lang-btn-landing').forEach(b => {
+    b.textContent = isTE ? '🇬🇧 EN' : '🇮🇳 తె';
+  });
+
+  // ── LANDING ──
+  safeText('lnd-choose-role', t('chooseRole'));
+  safeText('lnd-buyer-title', t('buyerTitle'));
+  safeText('lnd-buyer-sub',   t('buyerSub'));
+  safeText('lnd-farmer-title',t('farmerTitle'));
+  safeText('lnd-farmer-sub',  t('farmerSub'));
+  safeText('lnd-install-title',t('addHomeTitle'));
+  safeText('lnd-review-btn',  t('leaveReview'));
+
+  // ── BUYER AUTH ──
+  safeText('auth-buyer-title', t('buyerAccount'));
+  safeText('auth-buyer-sub',   t('buyerAccountSub'));
+  safeText('auth-buyer-create',t('createAccount'));
+  safeText('auth-buyer-login', t('login'));
+  safeText('auth-buyer-back',  t('backHome'));
+
+  // ── FARMER AUTH ──
+  safeText('auth-seller-title', t('farmerAccount'));
+  safeText('auth-seller-sub',   t('farmerAccountSub'));
+  safeText('auth-seller-create',t('createAccount'));
+  safeText('auth-seller-login', t('login'));
+  safeText('auth-seller-back',  t('backHome'));
+
+  // ── BUYER REGISTER ──
+  safeText('reg-buyer-hdr',    t('createBuyerAcc'));
+  safeText('reg-buyer-info',   t('registerInfo'));
+  safeText('reg-buyer-village-lbl', t('villageName'));
+  safePH('buyer-reg-village', t('villagePH'));
+  safeText('modal-village-lbl', t('villageName'));
+  safePH('add-farmer-village', t('farmerVillagePH'));
+  safeLabel('buyer-reg-name',  t('fullName'));
+  safePH('buyer-reg-name',     t('namePlaceholder'));
+  safeLabel('buyer-reg-phone', t('phoneNumber'));
+  safePH('buyer-reg-phone',    t('phonePlaceholder'));
+  safeText('reg-buyer-pin-lbl',t('create4pin'));
+  safeText('reg-buyer-btn',    t('createAccountBtn'));
+  safeText('reg-buyer-login-link', t('alreadyHaveAcc'));
+
+  // ── BUYER LOGIN ──
+  safeText('login-buyer-hdr', t('buyerLogin'));
+  safeLabel('buyer-login-phone', t('phoneNumber'));
+  safePH('buyer-login-phone',    t('phonePlaceholder'));
+  safeText('login-buyer-pin-lbl', t('pin4digit'));
+  safeText('login-buyer-btn',     t('loginBtn'));
+  safeText('login-buyer-reg-link',t('newHere'));
+  safeText('remember-buyer-lbl',  t('rememberMe'));
+
+  // ── BUYER DASHBOARD ──
+  safePH('farmer-search', t('searchPlaceholder'));
+  safeText('lbl-total-litres',  t('totalLitres'));
+  safeText('lbl-total-money',   t('totalMoney'));
+  safeText('lbl-total-farmers', t('farmers'));
+  safeText('btn-logout-buyer',  t('logoutBtn'));
+
+  // ── ADD FARMER MODAL ──
+  safeText('modal-add-farmer-title', t('addNewFarmer'));
+  safeLabel('add-farmer-name',  t('farmerName'));
+  safePH('add-farmer-name',     t('farmerNamePH'));
+  safeLabel('add-farmer-phone', t('farmerPhone'));
+  safePH('add-farmer-phone',    t('farmerPhonePH'));
+  safeLabel('add-farmer-price', t('pricePerLitre'));
+  safePH('add-farmer-price',    t('pricePH'));
+  safeText('btn-add-farmer',    t('addFarmerBtn'));
+
+  // ── FARMER DETAIL ──
+  safeText('fd-add-entry-title', t('addMilkEntry'));
+  safeText('fd-date-label',      t('date'));
+  safeText('fd-date-auto-btn',   t('autoToday'));
+  safeText('fd-date-manual-btn', t('manual'));
+  safeText('fd-litres-label',    t('litresCollected'));
+  safeText('fd-price-label',     t('pricePerL'));
+  safeText('fd-preview-label',   t('amountToPay'));
+  safeText('fd-save-btn',        t('saveEntry'));
+  safeText('fd-history-title',   t('entryHistory'));
+  safeText('fd-total-litres-lbl',t('totalLitres'));
+  safeText('fd-total-money-lbl', t('totalAmount'));
+
+  // ── SELLER REGISTER ──
+  safeText('reg-seller-hdr',     t('farmerRegister'));
+  safeText('reg-seller-info',    t('onlyBuyerNumber'));
+  safeLabel('seller-reg-phone',  t('yourPhone'));
+  safePH('seller-reg-phone',     t('yourPhonePH'));
+  safeText('reg-seller-pin-lbl', t('create4pin'));
+  safeText('reg-seller-btn',     t('registerBtn'));
+  safeText('reg-seller-note',    t('onlyWillWork'));
+
+  // ── SELLER LOGIN ──
+  safeText('login-seller-hdr',   t('farmerLogin'));
+  safeLabel('seller-login-phone',t('phoneNumber'));
+  safePH('seller-login-phone',   t('phonePlaceholder'));
+  safeText('login-seller-pin-lbl',t('pin4digit'));
+  safeText('login-seller-btn',   t('loginBtn'));
+  safeText('login-seller-reg-link',t('newRegFirst'));
+  safeText('remember-seller-lbl',t('rememberMe'));
+
+  // ── SELLER DASHBOARD ──
+  safeText('hdr-seller-title',   t('myMilkRecords'));
+  safeText('seller-view-only',   t('viewOnly'));
+  safeText('seller-daily-title', t('dailyRecords'));
+  safeText('btn-logout-seller',  t('logoutBtn'));
+
+  // ── REVIEW ──
+  safeText('review-title', t('rateMilkBook'));
+  safeText('review-sub',   t('rateSub'));
+  safeText('review-how',   t('howWasExp'));
+  safeLabel('review-text', t('commentsLabel'));
+  safePH('review-text',    t('commentsPH'));
+  safeText('review-submit',t('submitReview'));
+  safeText('review-back',  t('backToHome'));
+
+  // ── NOTIF BANNER ──
+  safeText('notif-text',   t('enableNotif'));
+  safeText('notif-enable-btn', t('enableBtn'));
+}
+
+function safeText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+function safeLabel(inputId, text) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  const lbl = inp.closest('.form-group')?.querySelector('label') ||
+              inp.closest('.phone-wrap')?.closest('.form-group')?.querySelector('label');
+  if (lbl) lbl.textContent = text;
+}
+function safePH(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.placeholder = text;
+}
+
 /* ══════════════════════════════════════════════════════════
    🔥 FIREBASE CONFIG
 ══════════════════════════════════════════════════════════ */
@@ -1394,15 +1847,17 @@ async function registerBuyer() {
   const name  = document.getElementById('buyer-reg-name').value.trim();
   const phone = document.getElementById('buyer-reg-phone').value.trim();
   const pin   = getPin('buyer-reg-pin');
-  if (!name)               return toast('Please enter your name', 'error');
-  if (phone.length !== 10) return toast('Enter valid 10-digit phone number', 'error');
+  if (!name)               return toast(t('enterName'), 'error');
+  if (phone.length !== 10) return toast(t('validPhone'), 'error');
   if (!/^\d{10}$/.test(phone)) return toast('Phone must be 10 digits only', 'error');
-  if (pin.length !== 4)    return toast('Enter all 4 PIN digits', 'error');
+  if (pin.length !== 4)    return toast(t('allPin'), 'error');
   try {
     const doc = await db.collection('buyers').doc(phone).get();
-    if (doc.exists) return toast('Phone already registered. Please login.', 'error');
+    if (doc.exists) return toast(t('alreadyReg'), 'error');
+    const village = document.getElementById('buyer-reg-village').value.trim();
     await db.collection('buyers').doc(phone).set({
-      name, phone, pin, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      name, phone, pin, village,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     toast('Account created! 🎉 Please login.', 'success');
     clearPin('buyer-reg-pin');
@@ -1419,18 +1874,19 @@ async function loginBuyer() {
   const phone  = document.getElementById('buyer-login-phone').value.trim();
   const pin    = getPin('buyer-login-pin');
   const remember = document.getElementById('buyer-remember').checked;
-  if (phone.length !== 10) return toast('Enter your 10-digit phone number', 'error');
-  if (pin.length !== 4)    return toast('Enter your 4-digit PIN', 'error');
+  if (phone.length !== 10) return toast(t('validPhone'), 'error');
+  if (pin.length !== 4)    return toast(t('allPin'), 'error');
   try {
     const doc = await db.collection('buyers').doc(phone).get();
-    if (!doc.exists)           return toast('Phone number not registered', 'error');
-    if (doc.data().pin !== pin) return toast('Wrong PIN. Try again.', 'error');
-    currentBuyer = { phone: doc.data().phone, name: doc.data().name };
+    if (!doc.exists)           return toast(t('notRegistered'), 'error');
+    if (doc.data().pin !== pin) return toast(t('wrongPin'), 'error');
+    currentBuyer = { phone: doc.data().phone, name: doc.data().name, village: doc.data().village || '' };
     if (remember) saveCredentials('buyer', phone, pin);
     else clearCredentials('buyer');
     saveSession('buyer', { phone, pin });
     clearPin('buyer-login-pin');
-    document.getElementById('buyer-greeting').textContent = 'Hi, ' + doc.data().name.split(' ')[0] + '!';
+    const greet = 'Hi, ' + doc.data().name.split(' ')[0] + (doc.data().village ? ' (' + doc.data().village + ')' : '') + '!';
+    document.getElementById('buyer-greeting').textContent = greet;
     toast('Welcome back, ' + doc.data().name.split(' ')[0] + '! 🥛', 'success');
     goTo('page-buyer-dashboard');
   } catch(e) { toast('Error: ' + e.message, 'error'); }
@@ -1507,7 +1963,11 @@ async function loadFarmerBadge(phone) {
 function searchFarmers() {
   const q = document.getElementById('farmer-search').value.trim().toLowerCase();
   if (!q) { renderFarmers(allFarmers); return; }
-  renderFarmers(allFarmers.filter(f => f.name.toLowerCase().includes(q) || f.phone.includes(q)));
+  renderFarmers(allFarmers.filter(f =>
+    f.name.toLowerCase().includes(q) ||
+    f.phone.includes(q) ||
+    (f.village && f.village.toLowerCase().includes(q))
+  ));
 }
 
 /* ══════════════════════════════════════
@@ -1517,19 +1977,20 @@ async function addFarmer() {
   const name  = document.getElementById('add-farmer-name').value.trim();
   const phone = document.getElementById('add-farmer-phone').value.trim();
   const price = parseFloat(document.getElementById('add-farmer-price').value);
-  if (!name)               return toast('Enter farmer name', 'error');
-  if (phone.length !== 10) return toast('Enter valid 10-digit phone', 'error');
-  if (!price || price <= 0) return toast('Enter valid price per litre', 'error');
+  if (!name)               return toast(t('enterFarmerName'), 'error');
+  if (phone.length !== 10) return toast(t('validPhone'), 'error');
+  if (!price || price <= 0) return toast(t('enterPrice'), 'error');
   try {
     const existing = await db.collection('farmers').doc(phone).get();
-    if (existing.exists && existing.data().buyerPhone === currentBuyer.phone) return toast('Farmer already added', 'error');
+    if (existing.exists && existing.data().buyerPhone === currentBuyer.phone) return toast(t('farmerAdded'), 'error');
+    const village = document.getElementById('add-farmer-village').value.trim();
     await db.collection('farmers').doc(phone).set({
-      name, phone, pricePerLiter: price,
+      name, phone, pricePerLiter: price, village,
       buyerPhone: currentBuyer.phone,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     closeModal('modal-add-farmer');
-    ['add-farmer-name','add-farmer-phone','add-farmer-price'].forEach(id => { document.getElementById(id).value = ''; });
+    ['add-farmer-name','add-farmer-phone','add-farmer-price','add-farmer-village'].forEach(id => { document.getElementById(id).value = ''; });
     toast('Farmer ' + name + ' added! 🎉', 'success');
     loadFarmers();
   } catch(e) { toast('Error: ' + e.message, 'error'); }
@@ -1543,7 +2004,7 @@ function openFarmerDetail(phone) {
   if (!f) return;
   currentFarmer = f;
   document.getElementById('farmer-detail-name').textContent = f.name;
-  document.getElementById('farmer-detail-price-badge').textContent = '₹' + f.pricePerLiter + '/L';
+  document.getElementById('farmer-detail-price-badge').textContent = (f.village ? '📍' + f.village + '  ' : '') + '₹' + f.pricePerLiter + '/L';
   document.getElementById('entry-price').value = f.pricePerLiter;
   document.getElementById('entry-liters-select').value = '';
   document.getElementById('entry-liters-custom').style.display = 'none';
@@ -1558,8 +2019,8 @@ function openFarmerDetail(phone) {
 function setDateMode(mode) {
   dateMode = mode;
   const inp = document.getElementById('entry-date');
-  const bA  = document.getElementById('btn-date-auto');
-  const bM  = document.getElementById('btn-date-manual');
+  const bA  = document.getElementById('fd-date-auto-btn');
+  const bM  = document.getElementById('fd-date-manual-btn');
   if (mode === 'auto') {
     inp.style.display = 'none';
     bA.classList.add('active'); bM.classList.remove('active');
@@ -1601,9 +2062,9 @@ async function addMilkEntry() {
   const liters = getLiters();
   const price  = parseFloat(document.getElementById('entry-price').value);
   let   date   = dateMode === 'auto' ? todayStr() : document.getElementById('entry-date').value;
-  if (!date)              return toast('Select a date', 'error');
-  if (!liters || liters <= 0) return toast('Select or enter litres', 'error');
-  if (!price || price <= 0)   return toast('Enter price per litre', 'error');
+  if (!date)              return toast(t('selectDate'), 'error');
+  if (!liters || liters <= 0) return toast(t('selectLitresErr'), 'error');
+  if (!price || price <= 0)   return toast(t('enterPriceErr'), 'error');
   const amount = parseFloat((liters * price).toFixed(2));
   try {
     await db.collection('milkEntries').add({
@@ -1761,13 +2222,13 @@ async function deleteEntry(id) {
 async function registerSeller() {
   const phone = document.getElementById('seller-reg-phone').value.trim();
   const pin   = getPin('seller-reg-pin');
-  if (phone.length !== 10) return toast('Enter valid 10-digit phone number', 'error');
-  if (pin.length !== 4)    return toast('Enter all 4 PIN digits', 'error');
+  if (phone.length !== 10) return toast(t('validPhone'), 'error');
+  if (pin.length !== 4)    return toast(t('allPin'), 'error');
   try {
     const fDoc = await db.collection('farmers').doc(phone).get();
-    if (!fDoc.exists) return toast('Number not registered by any buyer. Contact your buyer.', 'error');
+    if (!fDoc.exists) return toast(t('notRegBuyer'), 'error');
     const sDoc = await db.collection('sellers').doc(phone).get();
-    if (sDoc.exists) return toast('Already registered. Please login.', 'error');
+    if (sDoc.exists) return toast(t('alreadyRegLogin'), 'error');
     await db.collection('sellers').doc(phone).set({
       phone, pin, createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
@@ -1785,12 +2246,12 @@ async function loginSeller() {
   const phone   = document.getElementById('seller-login-phone').value.trim();
   const pin     = getPin('seller-login-pin');
   const remember = document.getElementById('seller-remember').checked;
-  if (phone.length !== 10) return toast('Enter your 10-digit phone number', 'error');
-  if (pin.length !== 4)    return toast('Enter your 4-digit PIN', 'error');
+  if (phone.length !== 10) return toast(t('validPhone'), 'error');
+  if (pin.length !== 4)    return toast(t('allPin'), 'error');
   try {
     const doc = await db.collection('sellers').doc(phone).get();
-    if (!doc.exists)           return toast('Not registered. Please register first.', 'error');
-    if (doc.data().pin !== pin) return toast('Wrong PIN. Try again.', 'error');
+    if (!doc.exists)           return toast(t('notRegFirst'), 'error');
+    if (doc.data().pin !== pin) return toast(t('wrongPin'), 'error');
     currentSeller = { phone };
     if (remember) saveCredentials('seller', phone, pin);
     else clearCredentials('seller');
@@ -1820,7 +2281,7 @@ async function loadSellerData() {
     const buyerName = bDoc.exists ? bDoc.data().name : farmer.buyerPhone;
 
     document.getElementById('seller-name-display').textContent  = farmer.name;
-    document.getElementById('seller-phone-display').textContent = '📞 +91 ' + farmer.phone;
+    document.getElementById('seller-phone-display').textContent = '📞 +91 ' + farmer.phone + (farmer.village ? '  📍 ' + farmer.village : '');
     document.getElementById('seller-price-display').textContent = '₹' + farmer.pricePerLiter + ' per litre';
     document.getElementById('seller-buyer-display').textContent = 'Buyer: ' + buyerName;
 
@@ -1902,7 +2363,7 @@ function setRating(n) {
 }
 
 async function submitReview() {
-  if (!selectedRating) return toast('Please tap a star to rate', 'error');
+  if (!selectedRating) return toast(t('rateStar'), 'error');
   const comment = document.getElementById('review-text').value.trim();
   try { await db.collection('reviews').add({ rating: selectedRating, comment, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); } catch(e) {}
   toast('Thank you for your review! 🌟', 'success');
@@ -1951,6 +2412,10 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(() => console.log('SW registered'))
       .catch(e => console.log('SW error:', e));
   }
+
+  // LOAD SAVED LANGUAGE
+  try { currentLang = localStorage.getItem('pk_lang') || 'en'; } catch(e) {}
+  applyLanguage();
 
   // AUTO LOGIN — check if user was already logged in
   tryAutoLogin();
