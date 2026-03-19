@@ -316,7 +316,7 @@
       background: white;
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius-lg);
-      padding: 16px 18px;
+      padding: 12px 18px;
       margin-bottom: 10px;
       cursor: pointer;
       width: 100%;
@@ -326,11 +326,20 @@
     }
     .role-btn:active { transform: scale(0.97); box-shadow: var(--shadow-md); }
     .role-icon {
-      width: 52px; height: 52px;
-      border-radius: 14px;
+      width: 72px; height: 72px;
+      border-radius: 16px;
       display: flex; align-items: center; justify-content: center;
       font-size: 26px;
       flex-shrink: 0;
+      overflow: hidden;
+      background: transparent;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+    }
+    .role-icon img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+      display: block;
     }
     .role-icon.buyer { background: linear-gradient(135deg, #d8f0dc, #b2debb); }
     .role-icon.seller { background: linear-gradient(135deg, #fef9e7, #fdedb0); }
@@ -665,7 +674,9 @@
   <div class="role-section">
     <h2 id="lnd-choose-role">Choose your role</h2>
     <button class="role-btn" onclick="goTo('page-buyer-auth')">
-      <div class="role-icon buyer">🛒</div>
+      <div class="role-icon buyer">
+        <img src="buyer.png" alt="Buyer" onerror="this.parentElement.innerHTML='🛒'">
+      </div>
       <div class="role-text">
         <h3 id="lnd-buyer-title">Buyer</h3>
         <p id="lnd-buyer-sub">Collect &amp; manage milk from farmers</p>
@@ -673,7 +684,9 @@
       <span class="role-arrow">›</span>
     </button>
     <button class="role-btn" onclick="goTo('page-seller-auth')">
-      <div class="role-icon seller">🐄</div>
+      <div class="role-icon seller">
+        <img src="seller.png" alt="Farmer" onerror="this.parentElement.innerHTML='🐄'">
+      </div>
       <div class="role-text">
         <h3 id="lnd-farmer-title">Farmer / Seller</h3>
         <p id="lnd-farmer-sub">View your daily milk &amp; payments</p>
