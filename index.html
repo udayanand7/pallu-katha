@@ -21,49 +21,109 @@
       --radius:14px;--radius-sm:8px;--radius-lg:20px;
     }
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-    body{font-family:'Noto Sans',sans-serif;background:var(--gray-50);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;}
-    /* ─── LAPTOP / DESKTOP RESPONSIVE ─── */
+    /* ─── MOBILE BASE ─── */
+    body {
+      font-family: 'Noto Sans', sans-serif;
+      background: var(--gray-50);
+      color: var(--text);
+      min-height: 100vh;
+      max-width: 430px;
+      margin: 0 auto;
+    }
+
+    /* ─── TABLET (768px+) ─── */
     @media (min-width: 768px) {
-      body {
-        max-width: 430px;
-        margin: 0 auto;
-        box-shadow: 0 0 40px rgba(0,0,0,0.12);
-        min-height: 100vh;
-      }
       html {
-        background: linear-gradient(135deg, #1b4020 0%, #2e9144 50%, #1a6b2a 100%);
+        background: linear-gradient(145deg, #1b4020 0%, #1a6b2a 40%, #217a33 100%);
         min-height: 100vh;
       }
-      /* Show desktop side panel */
+      body {
+        max-width: 420px;
+        margin: 0 auto;
+        box-shadow: 0 8px 48px rgba(0,0,0,0.35);
+        min-height: 100vh;
+        border-radius: 0;
+      }
+      .desktop-wrap { display: block !important; }
+      .desktop-sidebar { display: none !important; }
+      .desktop-app { display: contents; }
+      #splash-screen { position: fixed !important; }
+    }
+
+    /* ─── LAPTOP / DESKTOP (1024px+) ─── */
+    @media (min-width: 1024px) {
+      html {
+        background: linear-gradient(145deg, #1b4020 0%, #1a6b2a 40%, #217a33 100%);
+        min-height: 100vh;
+      }
+      body {
+        max-width: none;
+        margin: 0;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      /* ── Main layout: sidebar + app + info ── */
       .desktop-wrap {
-        display: flex !important;
-        align-items: flex-start;
+        display: grid !important;
+        grid-template-columns: 280px 420px 280px;
+        gap: 28px;
+        align-items: start;
         justify-content: center;
-        gap: 32px;
         padding: 32px 24px;
         min-height: 100vh;
+        max-width: 1200px;
+        margin: 0 auto;
       }
+
+      /* ── Left sidebar ── */
       .desktop-sidebar {
         display: flex !important;
         flex-direction: column;
-        gap: 20px;
-        width: 260px;
-        flex-shrink: 0;
-        padding-top: 16px;
+        gap: 16px;
+        position: sticky;
+        top: 32px;
+      }
+
+      /* ── App phone container ── */
+      .desktop-app {
+        background: var(--gray-50);
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.45), 0 0 0 8px rgba(255,255,255,0.08);
+        min-height: 600px;
+        position: relative;
+      }
+
+      /* Notch decoration on top */
+      .desktop-app::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 50%;
+        transform: translateX(-50%);
+        width: 120px; height: 6px;
+        background: rgba(0,0,0,0.15);
+        border-radius: 0 0 8px 8px;
+        z-index: 999;
+      }
+
+      body { background: transparent; max-width: none; margin: 0; box-shadow: none; }
+      .page { min-height: auto; }
+      .fab { bottom: 90px; right: 24px; }
+      #splash-screen { border-radius: 32px; overflow: hidden; }
+      #toast { position: absolute; }
+    }
+
+    /* ─── WIDE DESKTOP (1280px+) ─── */
+    @media (min-width: 1280px) {
+      .desktop-wrap {
+        grid-template-columns: 300px 440px 300px;
+        gap: 36px;
+        padding: 40px 32px;
       }
       .desktop-app {
-        width: 430px;
-        flex-shrink: 0;
-        border-radius: 24px;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        min-height: 100vh;
+        border-radius: 40px;
       }
-      body { border-radius: 0; box-shadow: none; }
-      #splash-screen { border-radius: 0; }
-    }
-    @media (min-width: 768px) {
-      .fab { bottom: 90px; }
     }
     h1,h2,h3,.stat-val,.fab{font-family:'Nunito',sans-serif;}
     .page{display:none;min-height:100vh;flex-direction:column;animation:fadeIn 0.25s ease;}
@@ -222,32 +282,32 @@
 <body>
 
 <!-- Desktop layout wrapper -->
-<div class="desktop-wrap" style="display:block;">
-  <div class="desktop-sidebar" style="display:none;">
-    <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:24px;text-align:center;">
-      <img src="logo.jpeg" alt="Logo" style="width:90px;height:90px;border-radius:18px;object-fit:cover;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;">
-      <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:white;margin-bottom:4px;">పాలు ఖాతా</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.7);font-weight:600;letter-spacing:1px;text-transform:uppercase;">Digital Dairy Account</div>
+<div class="desktop-wrap">
+
+  <!-- ── LEFT SIDEBAR ── -->
+  <div class="desktop-sidebar">
+    <!-- Logo card -->
+    <div style="background:rgba(255,255,255,0.13);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:24px;text-align:center;">
+      <img src="logo.jpeg" alt="Logo" style="width:96px;height:96px;border-radius:20px;object-fit:cover;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto;box-shadow:0 6px 20px rgba(0,0,0,0.25);">
+      <div style="font-family:'Nunito',sans-serif;font-size:24px;font-weight:900;color:white;margin-bottom:4px;letter-spacing:-0.5px;">పాలు ఖాతా</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.65);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Digital Dairy Account</div>
     </div>
-    <div style="background:rgba(255,255,255,0.10);border-radius:16px;padding:20px;">
-      <div style="font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:white;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">Features</div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:2;">
-        ✅ Daily milk tracking<br>
-        ✅ Morning / Afternoon / Evening<br>
-        ✅ Monthly paid/unpaid<br>
-        ✅ Farmer view-only access<br>
-        ✅ Telugu &amp; English<br>
-        ✅ Works offline (PWA)<br>
-        ✅ Install on any phone
-      </div>
-    </div>
-    <div style="background:rgba(255,255,255,0.10);border-radius:16px;padding:20px;text-align:center;">
-      <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:8px;">Scan to open on phone</div>
-      <div style="background:white;border-radius:12px;padding:12px;display:inline-block;">
-        <div style="font-size:11px;color:#1a6b2a;font-weight:700;">📱 పాలు ఖాతా</div>
+    <!-- Features card -->
+    <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.14);border-radius:20px;padding:22px;">
+      <div style="font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.6);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px;">App Features</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🥛</div><span style="font-size:13px;color:white;font-weight:600;">Daily milk entry tracking</span></div>
+        <div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🌅</div><span style="font-size:13px;color:white;font-weight:600;">Morning / Afternoon / Evening</span></div>
+        <div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">💰</div><span style="font-size:13px;color:white;font-weight:600;">Monthly paid/unpaid status</span></div>
+        <div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🧑‍🌾</div><span style="font-size:13px;color:white;font-weight:600;">Farmer view-only access</span></div>
+        <div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🔍</div><span style="font-size:13px;color:white;font-weight:600;">Search by name, phone, village</span></div>
+        <div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🌐</div><span style="font-size:13px;color:white;font-weight:600;">Telugu &amp; English support</span></div>
+        <div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📱</div><span style="font-size:13px;color:white;font-weight:600;">Install on phone as app</span></div>
       </div>
     </div>
   </div>
+
+  <!-- ── APP ── -->
   <div class="desktop-app">
 <div id="splash-screen">
   <img src="logo.jpeg" alt="పాలు ఖాతా">
@@ -1302,6 +1362,53 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
   </div><!-- end desktop-app -->
+
+  <!-- ── RIGHT SIDEBAR ── -->
+  <div class="desktop-sidebar">
+    <!-- How to use card -->
+    <div style="background:rgba(255,255,255,0.13);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:22px;">
+      <div style="font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.6);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px;">How to Use</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:26px;height:26px;background:#1a6b2a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;flex-shrink:0;font-family:'Nunito',sans-serif;">1</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.5;"><strong style="color:white;">Buyer</strong> registers and adds farmers with their phone number</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:26px;height:26px;background:#1a6b2a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;flex-shrink:0;font-family:'Nunito',sans-serif;">2</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.5;">Buyer adds daily milk entries with session and price</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:26px;height:26px;background:#1a6b2a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;flex-shrink:0;font-family:'Nunito',sans-serif;">3</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.5;"><strong style="color:white;">Farmer</strong> registers using the number buyer gave them</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:26px;height:26px;background:#1a6b2a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;flex-shrink:0;font-family:'Nunito',sans-serif;">4</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.5;">Farmer can view all records and payment status anytime</div>
+        </div>
+      </div>
+    </div>
+    <!-- Install card -->
+    <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.14);border-radius:20px;padding:22px;">
+      <div style="font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.6);margin-bottom:14px;text-transform:uppercase;letter-spacing:1px;">Install on Phone</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="background:rgba(0,0,0,0.15);border-radius:12px;padding:12px;">
+          <div style="font-size:12px;font-weight:800;color:#b2debb;margin-bottom:4px;">🤖 Android Chrome</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.5;">Tap ⋮ menu → "Add to Home Screen" → Install</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.15);border-radius:12px;padding:12px;">
+          <div style="font-size:12px;font-weight:800;color:#b2debb;margin-bottom:4px;">🍎 iPhone Safari</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.5;">Tap Share □↑ → "Add to Home Screen" → Add</div>
+        </div>
+      </div>
+    </div>
+    <!-- Stats card -->
+    <div style="background:rgba(255,255,255,0.10);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.14);border-radius:20px;padding:22px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;">🥛</div>
+      <div style="font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:white;margin-bottom:4px;">పాలు ఖాతా</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);">Free · Secure · Always Online</div>
+    </div>
+  </div>
+
 </div><!-- end desktop-wrap -->
 </body>
 </html>
