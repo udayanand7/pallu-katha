@@ -820,6 +820,13 @@
       <div style="font-size:13px;color:var(--green-900);"><span id="reg-buyer-info">📋 Register as a milk buyer to track daily milk collection from your farmers.</span></div>
     </div>
     <div class="form-group">
+      <label style="font-size:12px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.5px;">Account Type</label>
+      <select id="buyer-reg-type" onchange="onBuyerTypeChange()" style="width:100%;padding:12px 14px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:15px;font-family:'Noto Sans',sans-serif;background:white;color:var(--text);-webkit-appearance:none;">
+        <option value="middleman">🤝 Middle Man</option>
+        <option value="directfarmer">🧑‍🌾 Direct Farmer</option>
+      </select>
+    </div>
+    <div class="form-group">
       <label>Your Full Name</label>
       <input type="text" id="buyer-reg-name" placeholder="e.g. Suresh Kumar" autocomplete="name">
     </div>
@@ -1185,6 +1192,73 @@
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════
+     PAGE: DIRECT FARMER BUYER DASHBOARD
+══════════════════════════════════════ -->
+<div id="page-direct-dashboard" class="page">
+  <div class="header">
+    <img src="logo.jpeg" alt="Logo" style="width:32px;height:32px;border-radius:8px;object-fit:cover;">
+    <h1 id="direct-greeting">పాలు ఖాతా</h1>
+    <button class="lang-btn" onclick="toggleLang()">EN/తె</button>
+    <button class="logout-btn" onclick="logoutBuyer()" id="btn-logout-direct">Logout</button>
+  </div>
+
+  <div class="content">
+    <!-- View Only badge -->
+    <div class="view-only-badge">👀 View Only — Your seller manages entries</div>
+
+    <!-- Direct Buyer Info Card -->
+    <div class="card card-green" style="margin-bottom:14px;">
+      <div style="font-size:17px;font-weight:800;color:var(--green-900);font-family:'Nunito',sans-serif;" id="direct-buyer-name">—</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:2px;" id="direct-buyer-phone">—</div>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="chip chip-dark" id="direct-buyer-type">🧑‍🌾 Direct Farmer</span>
+        <span class="chip chip-green" id="direct-buyer-village" style="display:none;">📍 —</span>
+      </div>
+    </div>
+
+    <!-- Session Filter -->
+    <div class="form-group" style="margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px;">Filter by Session</label>
+      <div class="session-row">
+        <button class="session-btn active" id="direct-sess-all"       onclick="setDirectSession('all')">📋 All</button>
+        <button class="session-btn"        id="direct-sess-morning"   onclick="setDirectSession('morning')">🌅 Morning</button>
+        <button class="session-btn"        id="direct-sess-afternoon" onclick="setDirectSession('afternoon')">☀️ Afternoon</button>
+        <button class="session-btn"        id="direct-sess-evening"   onclick="setDirectSession('evening')">🌙 Evening</button>
+      </div>
+    </div>
+
+    <!-- Monthly Payment Status -->
+    <div class="paid-section" style="margin-bottom:14px;">
+      <div class="ps-title">💰 Monthly Payment Status</div>
+      <div id="direct-monthly-container"><div style="color:var(--text-muted);font-size:13px;">Loading...</div></div>
+    </div>
+
+    <!-- Entry History -->
+    <div class="section-title">📅 Daily Records</div>
+    <div id="direct-entries-container">
+      <div class="loading">Loading records…</div>
+    </div>
+  </div>
+
+  <!-- Total Bar -->
+  <div class="total-bar">
+    <div class="total-item">
+      <span class="stat-val" id="direct-total-liters">0 L</span>
+      <div class="stat-lbl">Total Litres</div>
+    </div>
+    <div class="total-item">
+      <span class="stat-val" id="direct-total-money">₹0</span>
+      <div class="stat-lbl">Total Amount</div>
+    </div>
+    <div class="total-item">
+      <span class="stat-val" id="direct-total-days">0</span>
+      <div class="stat-lbl">Days</div>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════════════════════════════
      PAGE: SELLER AUTH
 ══════════════════════════════════════ -->
@@ -1356,6 +1430,134 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+
+
+/* ══════════════════════════════════════
+   DIRECT FARMER BUYER DASHBOARD
+══════════════════════════════════════ */
+let directSession = 'all';   // all / morning / afternoon / evening
+
+function onBuyerTypeChange() {
+  // No extra logic needed on register form — just visual info
+}
+
+function setDirectSession(sess) {
+  directSession = sess;
+  ['all','morning','afternoon','evening'].forEach(s => {
+    const btn = document.getElementById('direct-sess-' + s);
+    if (btn) btn.classList.toggle('active', s === sess);
+  });
+  loadDirectDashboard();
+}
+
+async function loadDirectDashboard() {
+  if (!currentBuyer) return;
+
+  // Fill info card
+  document.getElementById('direct-buyer-name').textContent  = currentBuyer.name;
+  document.getElementById('direct-buyer-phone').textContent = '📞 +91 ' + currentBuyer.phone;
+
+  if (currentBuyer.village) {
+    const vEl = document.getElementById('direct-buyer-village');
+    vEl.style.display  = 'inline-flex';
+    vEl.textContent    = '📍 ' + currentBuyer.village;
+  }
+
+  // Load entries from sellers who added this buyer's phone
+  // Direct farmer buyer sees entries from directEntries where buyerPhone = their phone
+  const ctn  = document.getElementById('direct-entries-container');
+  const mctn = document.getElementById('direct-monthly-container');
+  ctn.innerHTML  = '<div class="loading">Loading records…</div>';
+  mctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">Loading...</div>';
+
+  try {
+    const [entrySnap, paidSnap] = await Promise.all([
+      db.collection('directEntries').where('buyerPhone', '==', currentBuyer.phone).get(),
+      db.collection('dfPayments').where('buyerPhone', '==', currentBuyer.phone).get()
+    ]);
+
+    // Filter by session if needed
+    let entries = entrySnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (directSession !== 'all') {
+      entries = entries.filter(e => e.session === directSession);
+    }
+    entries.sort((a, b) => {
+      if (b.date !== a.date) return b.date.localeCompare(a.date);
+      const order = { morning: 0, afternoon: 1, evening: 2 };
+      return (order[a.session] || 0) - (order[b.session] || 0);
+    });
+
+    // Build paid map
+    const paidMap = {};
+    paidSnap.docs.forEach(d => {
+      const data = d.data();
+      paidMap[data.month] = d.id;
+    });
+
+    // ── Monthly summary ──
+    const allEntries = entrySnap.docs.map(d => d.data()); // use all for monthly
+    const months = {};
+    allEntries.forEach(data => {
+      const ym = (data.date || '').substring(0, 7);
+      if (!ym) return;
+      if (!months[ym]) months[ym] = { liters: 0, amount: 0 };
+      months[ym].liters += (data.liters || 0);
+      months[ym].amount += (data.amount || 0);
+    });
+
+    const sortedMonths = Object.keys(months).sort().reverse();
+    if (sortedMonths.length) {
+      mctn.innerHTML = sortedMonths.map(ym => {
+        const isPaid = !!paidMap[ym];
+        const m = months[ym];
+        return `<div class="month-row">
+          <div class="month-name">${fmtMonth(ym)}</div>
+          <div class="month-stats">${m.liters.toFixed(1)}L · ₹${m.amount.toFixed(0)}</div>
+          <span class="paid-badge ${isPaid ? 'paid' : 'unpaid'}">${isPaid ? '✅ Paid' : '⏳ Unpaid'}</span>
+        </div>`;
+      }).join('');
+    } else {
+      mctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No records yet.</div>';
+    }
+
+    // ── Entry list ──
+    if (!entries.length) {
+      ctn.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>No records yet for this session.</p></div>';
+      document.getElementById('direct-total-liters').textContent = '0 L';
+      document.getElementById('direct-total-money').textContent  = '₹0';
+      document.getElementById('direct-total-days').textContent   = '0';
+      return;
+    }
+
+    let tL = 0, tM = 0;
+    const rows = entries.map(e => {
+      tL += (e.liters || 0); tM += (e.amount || 0);
+      const sess     = e.session || '';
+      const sessIcon = sess === 'morning' ? '🌅' : sess === 'afternoon' ? '☀️' : sess === 'evening' ? '🌙' : '';
+      const sessBadge = sess ? `<span class="session-badge ${sess}">${sessIcon} ${sess.charAt(0).toUpperCase()+sess.slice(1)}</span>` : '';
+      return `<div class="entry-row">
+        <div class="entry-date">
+          ${fmtDate(e.date)}
+          <small>${sessBadge} ₹${e.pricePerLiter}/L</small>
+        </div>
+        <div class="entry-lit">${e.liters} L</div>
+        <div class="entry-amt">₹${(e.amount || 0).toFixed(0)}</div>
+      </div>`;
+    }).join('');
+
+    ctn.innerHTML = '<div class="card" style="padding:8px 12px;">' + rows + '</div>';
+
+    // Count unique dates for "days"
+    const uniqueDates = new Set(entries.map(e => e.date)).size;
+    document.getElementById('direct-total-liters').textContent = tL.toFixed(1) + ' L';
+    document.getElementById('direct-total-money').textContent  = '₹' + tM.toFixed(0);
+    document.getElementById('direct-total-days').textContent   = uniqueDates;
+
+  } catch(e) {
+    ctn.innerHTML = '<div class="empty-state"><p>Error loading. Check connection.</p></div>';
+    console.error('loadDirectDashboard error:', e);
+  }
+}
 
 /* ══════════════════════════════════════════════════════
    🌐 MULTI-LANGUAGE — ENGLISH & TELUGU
@@ -1793,7 +1995,7 @@ let selectedRating = 0;
 const pageHistory = [];
 
 // Pages where back button should EXIT app (show confirm or go home)
-const ROOT_PAGES = ['page-landing', 'page-buyer-dashboard', 'page-seller-dashboard'];
+const ROOT_PAGES = ['page-landing', 'page-buyer-dashboard', 'page-seller-dashboard', 'page-direct-dashboard'];
 
 function goTo(pageId, addToHistory = true) {
   const currentPage = document.querySelector('.page.active');
@@ -1813,6 +2015,7 @@ function goTo(pageId, addToHistory = true) {
   window.history.pushState({ page: pageId }, '', '');
 
   if (pageId === 'page-buyer-dashboard') loadFarmers();
+  if (pageId === 'page-direct-dashboard') loadDirectDashboard();
   if (pageId === 'page-seller-dashboard') loadSellerData();
   if (pageId === 'page-buyer-login') autoFillBuyer();
   if (pageId === 'page-seller-login') autoFillSeller();
@@ -1830,6 +2033,7 @@ function goBack() {
     if (page) page.classList.add('active');
     window.scrollTo(0, 0);
     if (prevPage === 'page-buyer-dashboard') loadFarmers();
+    if (prevPage === 'page-direct-dashboard') loadDirectDashboard();
     if (prevPage === 'page-seller-dashboard') loadSellerData();
     return;
   }
@@ -1940,10 +2144,22 @@ async function tryAutoLogin() {
     if (role === 'buyer') {
       const doc = await db.collection('buyers').doc(data.phone).get();
       if (doc.exists && doc.data().pin === data.pin) {
-        currentBuyer = { phone: doc.data().phone, name: doc.data().name };
-        document.getElementById('buyer-greeting').textContent = 'Hi, ' + doc.data().name.split(' ')[0] + '!';
+        currentBuyer = {
+          phone:     doc.data().phone,
+          name:      doc.data().name,
+          village:   doc.data().village   || '',
+          buyerType: doc.data().buyerType || 'middleman'
+        };
+        const greet = 'Hi, ' + doc.data().name.split(' ')[0] + '!';
         showSplash(false);
-        goTo('page-buyer-dashboard');
+        if (currentBuyer.buyerType === 'directfarmer') {
+          document.getElementById('direct-greeting').textContent = greet;
+          goTo('page-direct-dashboard');
+          loadDirectDashboard();
+        } else {
+          document.getElementById('buyer-greeting').textContent = greet;
+          goTo('page-buyer-dashboard');
+        }
         return;
       }
     } else if (role === 'seller') {
@@ -2065,9 +2281,10 @@ async function registerBuyer() {
   try {
     const doc = await db.collection('buyers').doc(phone).get();
     if (doc.exists) return toast(t('alreadyReg'), 'error');
-    const village = document.getElementById('buyer-reg-village').value.trim();
+    const village   = document.getElementById('buyer-reg-village').value.trim();
+    const buyerType = document.getElementById('buyer-reg-type').value || 'middleman';
     await db.collection('buyers').doc(phone).set({
-      name, phone, pin, village,
+      name, phone, pin, village, buyerType,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     toast('Account created! 🎉 Please login.', 'success');
@@ -2091,15 +2308,27 @@ async function loginBuyer() {
     const doc = await db.collection('buyers').doc(phone).get();
     if (!doc.exists)           return toast(t('notRegistered'), 'error');
     if (doc.data().pin !== pin) return toast(t('wrongPin'), 'error');
-    currentBuyer = { phone: doc.data().phone, name: doc.data().name, village: doc.data().village || '' };
+    currentBuyer = {
+      phone:     doc.data().phone,
+      name:      doc.data().name,
+      village:   doc.data().village   || '',
+      buyerType: doc.data().buyerType || 'middleman'
+    };
     if (remember) saveCredentials('buyer', phone, pin);
     else clearCredentials('buyer');
     saveSession('buyer', { phone, pin });
     clearPin('buyer-login-pin');
     const greet = 'Hi, ' + doc.data().name.split(' ')[0] + (doc.data().village ? ' (' + doc.data().village + ')' : '') + '!';
-    document.getElementById('buyer-greeting').textContent = greet;
     toast('Welcome back, ' + doc.data().name.split(' ')[0] + '! 🥛', 'success');
-    goTo('page-buyer-dashboard');
+
+    if (currentBuyer.buyerType === 'directfarmer') {
+      document.getElementById('direct-greeting').textContent = greet;
+      goTo('page-direct-dashboard');
+      loadDirectDashboard();
+    } else {
+      document.getElementById('buyer-greeting').textContent = greet;
+      goTo('page-buyer-dashboard');
+    }
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
