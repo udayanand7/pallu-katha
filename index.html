@@ -21,32 +21,56 @@
       --radius:14px;--radius-sm:8px;--radius-lg:20px;
     }
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-    /* ─── MOBILE BASE ─── */
+    /* ─── MOBILE BASE (default — phones) ─── */
     body {
       font-family: 'Noto Sans', sans-serif;
       background: var(--gray-50);
       color: var(--text);
       min-height: 100vh;
-      max-width: 430px;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      overflow-x: hidden;
     }
 
-    /* ─── TABLET (768px+) ─── */
-    @media (min-width: 768px) {
+    /* Hide sidebars on mobile — default */
+    .desktop-sidebar { display: none !important; }
+    .desktop-wrap {
+      display: block;
+      width: 100%;
+    }
+    .desktop-app {
+      display: block;
+      width: 100%;
+    }
+
+    /* Fix all pages to be full width on mobile */
+    .page {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    /* Fix header to not overflow */
+    .header {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* ─── TABLET (768px — 1023px) ─── */
+    @media (min-width: 768px) and (max-width: 1023px) {
       html {
         background: linear-gradient(145deg, #1b4020 0%, #1a6b2a 40%, #217a33 100%);
         min-height: 100vh;
       }
       body {
-        max-width: 420px;
+        max-width: 480px;
         margin: 0 auto;
-        box-shadow: 0 8px 48px rgba(0,0,0,0.35);
-        min-height: 100vh;
-        border-radius: 0;
+        box-shadow: 0 0 60px rgba(0,0,0,0.4);
+        overflow-x: hidden;
       }
-      .desktop-wrap { display: block !important; }
       .desktop-sidebar { display: none !important; }
-      .desktop-app { display: contents; }
+      .desktop-wrap { display: block; }
+      .desktop-app { display: block; width: 100%; }
       #splash-screen { position: fixed !important; }
     }
 
