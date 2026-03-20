@@ -133,7 +133,16 @@
 
       body { background: transparent; max-width: none; margin: 0; box-shadow: none; }
       .page { min-height: auto; }
-      .fab { bottom: 90px; right: 24px; }
+      /* On desktop, FAB must stay inside the app container */
+      .fab {
+        position: absolute !important;
+        bottom: 90px;
+        right: 20px;
+      }
+      /* desktop-app needs position relative for absolute FAB */
+      .desktop-app {
+        position: relative;
+      }
       #splash-screen { border-radius: 32px; overflow: hidden; }
       #toast { position: absolute; }
     }
