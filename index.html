@@ -22,6 +22,49 @@
     }
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
     body{font-family:'Noto Sans',sans-serif;background:var(--gray-50);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;}
+    /* ─── LAPTOP / DESKTOP RESPONSIVE ─── */
+    @media (min-width: 768px) {
+      body {
+        max-width: 430px;
+        margin: 0 auto;
+        box-shadow: 0 0 40px rgba(0,0,0,0.12);
+        min-height: 100vh;
+      }
+      html {
+        background: linear-gradient(135deg, #1b4020 0%, #2e9144 50%, #1a6b2a 100%);
+        min-height: 100vh;
+      }
+      /* Show desktop side panel */
+      .desktop-wrap {
+        display: flex !important;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 32px;
+        padding: 32px 24px;
+        min-height: 100vh;
+      }
+      .desktop-sidebar {
+        display: flex !important;
+        flex-direction: column;
+        gap: 20px;
+        width: 260px;
+        flex-shrink: 0;
+        padding-top: 16px;
+      }
+      .desktop-app {
+        width: 430px;
+        flex-shrink: 0;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        min-height: 100vh;
+      }
+      body { border-radius: 0; box-shadow: none; }
+      #splash-screen { border-radius: 0; }
+    }
+    @media (min-width: 768px) {
+      .fab { bottom: 90px; }
+    }
     h1,h2,h3,.stat-val,.fab{font-family:'Nunito',sans-serif;}
     .page{display:none;min-height:100vh;flex-direction:column;animation:fadeIn 0.25s ease;}
     .page.active{display:flex;}
@@ -178,6 +221,34 @@
 </head>
 <body>
 
+<!-- Desktop layout wrapper -->
+<div class="desktop-wrap" style="display:block;">
+  <div class="desktop-sidebar" style="display:none;">
+    <div style="background:rgba(255,255,255,0.12);border-radius:20px;padding:24px;text-align:center;">
+      <img src="logo.jpeg" alt="Logo" style="width:90px;height:90px;border-radius:18px;object-fit:cover;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;">
+      <div style="font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;color:white;margin-bottom:4px;">పాలు ఖాతా</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.7);font-weight:600;letter-spacing:1px;text-transform:uppercase;">Digital Dairy Account</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.10);border-radius:16px;padding:20px;">
+      <div style="font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:white;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">Features</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.85);line-height:2;">
+        ✅ Daily milk tracking<br>
+        ✅ Morning / Afternoon / Evening<br>
+        ✅ Monthly paid/unpaid<br>
+        ✅ Farmer view-only access<br>
+        ✅ Telugu &amp; English<br>
+        ✅ Works offline (PWA)<br>
+        ✅ Install on any phone
+      </div>
+    </div>
+    <div style="background:rgba(255,255,255,0.10);border-radius:16px;padding:20px;text-align:center;">
+      <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:8px;">Scan to open on phone</div>
+      <div style="background:white;border-radius:12px;padding:12px;display:inline-block;">
+        <div style="font-size:11px;color:#1a6b2a;font-weight:700;">📱 పాలు ఖాతా</div>
+      </div>
+    </div>
+  </div>
+  <div class="desktop-app">
 <div id="splash-screen">
   <img src="logo.jpeg" alt="పాలు ఖాతా">
   <div class="splash-name">పాలు ఖాతా</div>
@@ -714,7 +785,9 @@ function requestNotifPermission() {
   });
 }
 function sendNotification(title,body) {
-  if('Notification' in window && Notification.permission==='granted') new Notification(title,{body,icon:'/pallu-katha/icon-192.png'});
+  if('Notification' in window && Notification.permission==='granted') {
+    try { new Notification(title,{body,icon:'icon-192.png'}); } catch(e) { console.log('Notif error:',e); }
+  }
 }
 
 /* ══ MODALS ══ */
@@ -923,7 +996,7 @@ async function addMilkEntry() {
     document.getElementById('entry-liters-custom').value='';
     document.getElementById('entry-preview').style.display='none';
     toast('Entry saved! ✅','success');
-    sendNotification('పాలు ఖాతా — New Entry', currentFarmer.name+': '+liters+'L ('+session+') = ₹'+amount);
+    try { sendNotification('పాలు ఖాతా — New Entry', currentFarmer.name+': '+liters+'L ('+session+') = ₹'+amount); } catch(e) {}
     loadFarmerEntries();
     loadMonthlyPayments();
     calcBuyerTotals();
@@ -972,7 +1045,8 @@ async function loadMonthlyPayments() {
   if (!ctn) return;
   ctn.innerHTML='<div style="color:var(--text-muted);font-size:13px;padding:4px 0;">Loading...</div>';
   try {
-    const [entrySnap,paidSnap] = await Promise.all([
+    if (!currentFarmer || !currentBuyer) return;
+  const [entrySnap,paidSnap] = await Promise.all([
       db.collection('milkEntries').where('farmerPhone','==',currentFarmer.phone).get(),
       db.collection('monthlyPayments').where('farmerPhone','==',currentFarmer.phone).get()
     ]);
@@ -1022,7 +1096,7 @@ async function togglePaid(btn) {
       });
       btn.dataset.docid=ref.id;
       toast('Marked as Paid ✅','success');
-      sendNotification('పాలు ఖాతా — Payment Paid', currentFarmer.name+' — '+fmtMonth(month)+' marked as paid!');
+      try { sendNotification('పాలు ఖాతా — Payment Paid', currentFarmer.name+' — '+fmtMonth(month)+' marked as paid!'); } catch(e) {}
     }
   } catch(e) {
     toast('Error saving. Try again.','error');
@@ -1118,6 +1192,7 @@ async function loadSellerData() {
 }
 
 async function renderSellerEntries(entries) {
+  if (!currentSeller) return;
   const ctn=document.getElementById('seller-entries-container');
   if (!entries.length) {
     ctn.innerHTML='<div class="empty-state"><div class="ei">📋</div><p>No records for this filter.</p></div>';
@@ -1226,5 +1301,7 @@ document.addEventListener('DOMContentLoaded', () => {
   tryAutoLogin();
 });
 </script>
+  </div><!-- end desktop-app -->
+</div><!-- end desktop-wrap -->
 </body>
 </html>
