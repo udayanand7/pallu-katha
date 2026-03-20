@@ -632,6 +632,81 @@
       z-index: 500;
       display: none;
     }
+
+    /* ─── FARMER TYPE TABS ─── */
+    .type-tabs {
+      display: flex;
+      background: var(--gray-100);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      margin: 0 0 14px;
+      gap: 4px;
+    }
+    .type-tab {
+      flex: 1; padding: 10px 6px;
+      border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: all 0.18s;
+      color: var(--text-soft);
+      background: transparent;
+      font-family: 'Nunito', sans-serif;
+      line-height: 1.3;
+      text-align: center;
+    }
+    .type-tab.active {
+      background: var(--green-800);
+      color: white;
+      box-shadow: 0 2px 8px rgba(26,107,42,0.25);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeIn 0.2s; }
+
+    /* ─── SESSION BADGE ─── */
+    .session-row {
+      display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .session-btn {
+      flex: 1; padding: 9px 6px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: white;
+      font-size: 12px; font-weight: 700;
+      cursor: pointer; text-align: center;
+      transition: all 0.15s;
+      font-family: 'Nunito', sans-serif;
+      color: var(--text-soft);
+    }
+    .session-btn.active {
+      border-color: var(--green-600);
+      background: var(--green-50);
+      color: var(--green-800);
+    }
+    .session-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 8px; border-radius: 12px;
+      font-size: 11px; font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+    }
+    .session-badge.morning  { background:#fff8e1; color:#f57f17; border:1px solid #ffe082; }
+    .session-badge.afternoon{ background:#e3f2fd; color:#1565c0; border:1px solid #90caf9; }
+    .session-badge.evening  { background:#f3e5f5; color:#6a1b9a; border:1px solid #ce93d8; }
+
+    /* ─── DIRECT FARMER INFO ─── */
+    .df-info-card {
+      background: var(--green-50);
+      border: 1px solid var(--green-200);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .df-info-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 0; border-bottom: 1px solid var(--green-100);
+      font-size: 13px;
+    }
+    .df-info-row:last-child { border: none; padding-bottom: 0; }
+    .df-info-row .lbl { color: var(--text-muted); font-size: 12px; min-width: 80px; font-weight: 600; }
+    .df-info-row .val { color: var(--text); font-weight: 700; font-family: 'Nunito', sans-serif; }
   </style>
 </head>
 <body>
@@ -892,89 +967,216 @@
   <div class="header">
     <button class="back-btn" onclick="goTo('page-buyer-dashboard')">‹</button>
     <h1 id="farmer-detail-name">Farmer</h1>
-    <span id="farmer-detail-price-badge" style="font-size:13px;opacity:0.9;font-family:'Nunito';font-weight:700;"></span>
+    <span id="farmer-detail-price-badge" style="font-size:12px;opacity:0.9;font-family:'Nunito';font-weight:700;"></span>
     <button class="lang-btn" onclick="toggleLang()">EN/తె</button>
   </div>
 
   <div class="content">
-    <!-- Add Entry Card -->
-    <div class="card" style="margin-bottom:16px;">
-      <div id="fd-add-entry-title" class="section-title">📋 Add Milk Entry</div>
 
-      <div class="form-group">
-        <label id="fd-date-label">Date</label>
-        <div class="date-toggle">
-          <button id="fd-date-auto-btn" class="active" onclick="setDateMode('auto')">🗓 Auto (Today)</button>
-          <button id="fd-date-manual-btn" onclick="setDateMode('manual')">✏️ Manual</button>
+    <!-- ══ TWO TYPE TABS ══ -->
+    <div class="type-tabs">
+      <button class="type-tab active" id="tab-middleman" onclick="switchFarmerTab('middleman')">
+        🤝 Middle Man
+      </button>
+      <button class="type-tab" id="tab-directfarmer" onclick="switchFarmerTab('directfarmer')">
+        🧑‍🌾 Direct Farmer
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════
+         TAB 1 — MIDDLE MAN
+    ══════════════════════════════ -->
+    <div id="panel-middleman" class="tab-panel active">
+
+      <!-- Add Entry Card -->
+      <div class="card" style="margin-bottom:16px;">
+        <div id="fd-add-entry-title" class="section-title">📋 Add Milk Entry</div>
+
+        <!-- Session Morning/Afternoon/Evening -->
+        <div class="form-group">
+          <label style="font-size:12px;font-weight:600;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.5px;">Session</label>
+          <div class="session-row">
+            <button class="session-btn active" id="mm-sess-morning"   onclick="setSession('mm','morning')">🌅 Morning</button>
+            <button class="session-btn"        id="mm-sess-afternoon" onclick="setSession('mm','afternoon')">☀️ Afternoon</button>
+            <button class="session-btn"        id="mm-sess-evening"   onclick="setSession('mm','evening')">🌙 Evening</button>
+          </div>
         </div>
-        <input type="date" id="entry-date" style="display:none;">
+
+        <div class="form-group">
+          <label id="fd-date-label">Date</label>
+          <div class="date-toggle">
+            <button id="fd-date-auto-btn" class="active" onclick="setDateMode('auto')">🗓 Auto (Today)</button>
+            <button id="fd-date-manual-btn" onclick="setDateMode('manual')">✏️ Manual</button>
+          </div>
+          <input type="date" id="entry-date" style="display:none;">
+        </div>
+
+        <div class="form-group">
+          <label id="fd-litres-label">Litres Collected</label>
+          <div style="display:flex;gap:8px;">
+            <select id="entry-liters-select" onchange="onLiterChange()" style="flex:1;">
+              <option value="">— Select Litres —</option>
+              <option value="0.5">0.5 L</option>
+              <option value="1">1 L</option>
+              <option value="1.5">1.5 L</option>
+              <option value="2">2 L</option>
+              <option value="2.5">2.5 L</option>
+              <option value="3">3 L</option>
+              <option value="3.5">3.5 L</option>
+              <option value="4">4 L</option>
+              <option value="4.5">4.5 L</option>
+              <option value="5">5 L</option>
+              <option value="5.5">5.5 L</option>
+              <option value="6">6 L</option>
+              <option value="45">45 L</option>
+              <option value="50">50 L</option>
+              <option value="55">55 L</option>
+              <option value="60">60 L</option>
+              <option value="custom">Custom...</option>
+            </select>
+            <input type="number" id="entry-liters-custom" placeholder="L" min="0.1" step="0.5" inputmode="decimal"
+              style="width:82px;padding:12px 8px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:15px;display:none;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label id="fd-price-label">Price Per Litre (₹)</label>
+          <input type="number" id="entry-price" placeholder="₹ per litre" min="1" inputmode="numeric" oninput="updatePreview()">
+        </div>
+
+        <div class="preview-box" id="entry-preview">
+          <div id="fd-preview-label" class="lbl">Amount to Pay</div>
+          <div class="val" id="preview-amount">₹0</div>
+        </div>
+
+        <button id="fd-save-btn" class="btn btn-primary" onclick="addMilkEntry()">✓ Save Entry</button>
       </div>
 
-      <div class="form-group">
-        <label id="fd-litres-label">Litres Collected</label>
-        <div style="display:flex;gap:8px;">
-          <select id="entry-liters-select" onchange="onLiterChange()" style="flex:1;">
-            <option value="">— Select Litres —</option>
-            <option value="0.5">0.5 L</option>
-            <option value="1">1 L</option>
-            <option value="1.5">1.5 L</option>
-            <option value="2">2 L</option>
-            <option value="2.5">2.5 L</option>
-            <option value="3">3 L</option>
-            <option value="3.5">3.5 L</option>
-            <option value="4">4 L</option>
-            <option value="4.5">4.5 L</option>
-            <option value="5">5 L</option>
-            <option value="5.5">5.5 L</option>
-            <option value="6">6 L</option>
-            <option value="45">45 L</option>
-            <option value="50">50 L</option>
-            <option value="55">55 L</option>
-            <option value="60">60 L</option>
-            <option value="custom">Custom...</option>
-          </select>
-          <input type="number" id="entry-liters-custom" placeholder="L" min="0.1" step="0.5" inputmode="decimal"
-            style="width:82px;padding:12px 8px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:15px;display:none;">
+      <!-- Notification banner -->
+      <div class="notif-banner" id="notif-banner" style="display:none;">
+        <span style="font-size:20px;">🔔</span>
+        <p id="notif-text">Enable notifications to alert farmer when new entry is added!</p>
+        <button id="notif-enable-btn" onclick="requestNotifPermission()">Enable</button>
+      </div>
+
+      <!-- Monthly Paid/Unpaid -->
+      <div class="paid-section" id="paid-section">
+        <div class="ps-title">💰 Monthly Payment Status</div>
+        <div id="monthly-payment-container"><div style="color:var(--text-muted);font-size:13px;">Loading...</div></div>
+      </div>
+
+      <!-- History -->
+      <div id="fd-history-title" class="section-title">📅 Entry History</div>
+      <div id="entries-container">
+        <div class="loading">Loading entries…</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════
+         TAB 2 — DIRECT FARMER
+    ══════════════════════════════ -->
+    <div id="panel-directfarmer" class="tab-panel">
+
+      <!-- Farmer Info Card (like seller view) -->
+      <div class="df-info-card" id="df-info-card">
+        <div style="font-size:15px;font-weight:800;color:var(--green-900);font-family:'Nunito',sans-serif;margin-bottom:10px;" id="df-farmer-name">—</div>
+        <div class="df-info-row">
+          <span class="lbl">📞 Phone</span>
+          <span class="val" id="df-farmer-phone">—</span>
+        </div>
+        <div class="df-info-row" id="df-village-row" style="display:none;">
+          <span class="lbl">📍 Village</span>
+          <span class="val" id="df-farmer-village">—</span>
+        </div>
+        <div class="df-info-row">
+          <span class="lbl">💰 Rate</span>
+          <span class="val" id="df-farmer-rate">—</span>
         </div>
       </div>
 
-      <div class="form-group">
-        <label id="fd-price-label">Price Per Litre (₹)</label>
-        <input type="number" id="entry-price" placeholder="₹ per litre" min="1" inputmode="numeric" oninput="updatePreview()">
+      <!-- Add Direct Entry -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="section-title">📋 Add Direct Entry</div>
+
+        <!-- Session Morning/Afternoon/Evening -->
+        <div class="form-group">
+          <label style="font-size:12px;font-weight:600;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.5px;">Session</label>
+          <div class="session-row">
+            <button class="session-btn active" id="df-sess-morning"   onclick="setSession('df','morning')">🌅 Morning</button>
+            <button class="session-btn"        id="df-sess-afternoon" onclick="setSession('df','afternoon')">☀️ Afternoon</button>
+            <button class="session-btn"        id="df-sess-evening"   onclick="setSession('df','evening')">🌙 Evening</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Date</label>
+          <div class="date-toggle">
+            <button id="df-date-auto-btn" class="active" onclick="setDateModeDF('auto')">🗓 Auto (Today)</button>
+            <button id="df-date-manual-btn" onclick="setDateModeDF('manual')">✏️ Manual</button>
+          </div>
+          <input type="date" id="df-entry-date" style="display:none;">
+        </div>
+
+        <div class="form-group">
+          <label>Litres Collected</label>
+          <div style="display:flex;gap:8px;">
+            <select id="df-liters-select" onchange="onDFLiterChange()" style="flex:1;">
+              <option value="">— Select Litres —</option>
+              <option value="0.5">0.5 L</option>
+              <option value="1">1 L</option>
+              <option value="1.5">1.5 L</option>
+              <option value="2">2 L</option>
+              <option value="2.5">2.5 L</option>
+              <option value="3">3 L</option>
+              <option value="3.5">3.5 L</option>
+              <option value="4">4 L</option>
+              <option value="4.5">4.5 L</option>
+              <option value="5">5 L</option>
+              <option value="5.5">5.5 L</option>
+              <option value="6">6 L</option>
+              <option value="45">45 L</option>
+              <option value="50">50 L</option>
+              <option value="55">55 L</option>
+              <option value="60">60 L</option>
+              <option value="custom">Custom...</option>
+            </select>
+            <input type="number" id="df-liters-custom" placeholder="L" min="0.1" step="0.5" inputmode="decimal"
+              style="width:82px;padding:12px 8px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);font-size:15px;display:none;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Price Per Litre (₹)</label>
+          <input type="number" id="df-entry-price" placeholder="₹ per litre" min="1" inputmode="numeric" oninput="updateDFPreview()">
+        </div>
+
+        <div class="preview-box" id="df-entry-preview">
+          <div class="lbl">Amount to Pay</div>
+          <div class="val" id="df-preview-amount">₹0</div>
+        </div>
+
+        <button class="btn btn-primary" onclick="addDirectEntry()">✓ Save Entry</button>
       </div>
 
-      <div class="preview-box" id="entry-preview">
-        <div id="fd-preview-label" class="lbl">Amount to Pay</div>
-        <div class="val" id="preview-amount">₹0</div>
+      <!-- Monthly Paid/Unpaid for Direct -->
+      <div class="paid-section">
+        <div class="ps-title">💰 Monthly Payment Status</div>
+        <div id="df-monthly-payment-container"><div style="color:var(--text-muted);font-size:13px;">Loading...</div></div>
       </div>
 
-      <button id="fd-save-btn" class="btn btn-primary" onclick="addMilkEntry()">✓ Save Entry</button>
+      <!-- Direct Farmer History -->
+      <div class="section-title">📅 Entry History</div>
+      <div id="df-entries-container">
+        <div class="loading">Loading entries…</div>
+      </div>
     </div>
 
-    <!-- Notification banner -->
-    <div class="notif-banner" id="notif-banner" style="display:none;">
-      <span style="font-size:20px;">🔔</span>
-      <p id="notif-text">Enable notifications to alert farmer when new entry is added!</p>
-      <button id="notif-enable-btn" onclick="requestNotifPermission()">Enable</button>
-    </div>
-
-    <!-- Monthly Paid/Unpaid Section -->
-    <div class="paid-section" id="paid-section">
-      <div class="ps-title">💰 Monthly Payment Status</div>
-      <div id="monthly-payment-container"><div style="color:var(--text-muted);font-size:13px;">Loading...</div></div>
-    </div>
-
-    <!-- History -->
-    <div id="fd-history-title" class="section-title">📅 Entry History</div>
-    <div id="entries-container">
-      <div class="loading">Loading entries…</div>
-    </div>
-  </div>
+  </div><!-- end .content -->
 
   <div class="total-bar">
     <div class="total-item">
       <span class="stat-val" id="farmer-total-liters">0 L</span>
-      <div class="stat-lbl">Total Litres</div>
+      <div class="stat-lbl" id="fd-total-litres-lbl">Total Litres</div>
     </div>
     <div class="total-item">
       <span class="stat-val" id="farmer-total-money">₹0</span>
@@ -2005,6 +2207,297 @@ async function addFarmer() {
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
+
+/* ══════════════════════════════════════
+   FARMER TAB — MIDDLE MAN / DIRECT FARMER
+══════════════════════════════════════ */
+let currentTab      = 'middleman'; // 'middleman' or 'directfarmer'
+let mmSession       = 'morning';   // Middle Man session
+let dfSession       = 'morning';   // Direct Farmer session
+let dfDateMode      = 'auto';
+
+function switchFarmerTab(tab) {
+  currentTab = tab;
+
+  // Update tab buttons
+  document.getElementById('tab-middleman').classList.toggle('active',    tab === 'middleman');
+  document.getElementById('tab-directfarmer').classList.toggle('active', tab === 'directfarmer');
+
+  // Show/hide panels
+  document.getElementById('panel-middleman').classList.toggle('active',    tab === 'middleman');
+  document.getElementById('panel-directfarmer').classList.toggle('active', tab === 'directfarmer');
+
+  // Update total bar
+  if (tab === 'middleman') {
+    loadFarmerEntries();
+  } else {
+    loadDirectEntries();
+    loadDFMonthlyPayments();
+    fillDFInfo();
+  }
+}
+
+// ── Fill Direct Farmer info card ──
+function fillDFInfo() {
+  if (!currentFarmer) return;
+  document.getElementById('df-farmer-name').textContent  = currentFarmer.name;
+  document.getElementById('df-farmer-phone').textContent = '+91 ' + currentFarmer.phone;
+  document.getElementById('df-farmer-rate').textContent  = '₹' + currentFarmer.pricePerLiter + ' per litre';
+  if (currentFarmer.village) {
+    document.getElementById('df-village-row').style.display    = 'flex';
+    document.getElementById('df-farmer-village').textContent   = currentFarmer.village;
+  } else {
+    document.getElementById('df-village-row').style.display = 'none';
+  }
+}
+
+// ── Session selector ──
+function setSession(type, session) {
+  if (type === 'mm') {
+    mmSession = session;
+    ['morning','afternoon','evening'].forEach(s => {
+      document.getElementById('mm-sess-' + s).classList.toggle('active', s === session);
+    });
+  } else {
+    dfSession = session;
+    ['morning','afternoon','evening'].forEach(s => {
+      document.getElementById('df-sess-' + s).classList.toggle('active', s === session);
+    });
+  }
+}
+
+// ── Direct Farmer date mode ──
+function setDateModeDF(mode) {
+  dfDateMode = mode;
+  const inp = document.getElementById('df-entry-date');
+  const bA  = document.getElementById('df-date-auto-btn');
+  const bM  = document.getElementById('df-date-manual-btn');
+  if (mode === 'auto') {
+    inp.style.display = 'none';
+    bA.classList.add('active'); bM.classList.remove('active');
+  } else {
+    inp.style.display = 'block';
+    bM.classList.add('active'); bA.classList.remove('active');
+    inp.value = todayStr();
+  }
+}
+
+// ── Direct Farmer litre change ──
+function onDFLiterChange() {
+  const sel = document.getElementById('df-liters-select');
+  const cus = document.getElementById('df-liters-custom');
+  cus.style.display = sel.value === 'custom' ? 'block' : 'none';
+  if (sel.value === 'custom') cus.focus();
+  updateDFPreview();
+}
+
+function getDFLiters() {
+  const sel = document.getElementById('df-liters-select').value;
+  if (sel === 'custom') return parseFloat(document.getElementById('df-liters-custom').value) || 0;
+  return parseFloat(sel) || 0;
+}
+
+function updateDFPreview() {
+  const l = getDFLiters();
+  const p = parseFloat(document.getElementById('df-entry-price').value);
+  const box = document.getElementById('df-entry-preview');
+  if (l > 0 && p > 0) {
+    box.style.display = 'block';
+    document.getElementById('df-preview-amount').textContent = '₹' + (l * p).toFixed(2);
+  } else { box.style.display = 'none'; }
+}
+
+// ── Add Direct Farmer Entry ──
+async function addDirectEntry() {
+  if (!currentFarmer || !currentBuyer) return;
+  const liters = getDFLiters();
+  const price  = parseFloat(document.getElementById('df-entry-price').value);
+  const date   = dfDateMode === 'auto' ? todayStr() : (document.getElementById('df-entry-date').value);
+  if (!date)               return toast(t('selectDate'), 'error');
+  if (!liters || liters <= 0) return toast(t('selectLitresErr'), 'error');
+  if (!price  || price  <= 0) return toast(t('enterPriceErr'), 'error');
+
+  const amount = parseFloat((liters * price).toFixed(2));
+  try {
+    await db.collection('directEntries').add({
+      buyerPhone:   currentBuyer.phone,
+      farmerPhone:  currentFarmer.phone,
+      farmerName:   currentFarmer.name,
+      liters, pricePerLiter: price, amount, date,
+      session:      dfSession,
+      createdAt:    firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Reset form
+    document.getElementById('df-liters-select').value  = '';
+    document.getElementById('df-liters-custom').style.display = 'none';
+    document.getElementById('df-liters-custom').value  = '';
+    document.getElementById('df-entry-preview').style.display = 'none';
+
+    toast('Entry saved! ✅', 'success');
+    sendNotification('పాలు ఖాతా — Direct Entry Added',
+      currentFarmer.name + ': ' + liters + 'L ' + dfSession + ' = ₹' + amount);
+    loadDirectEntries();
+    loadDFMonthlyPayments();
+    calcBuyerTotals();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ── Load Direct Farmer Entries ──
+async function loadDirectEntries() {
+  const ctn = document.getElementById('df-entries-container');
+  if (!ctn || !currentFarmer || !currentBuyer) return;
+  ctn.innerHTML = '<div class="loading">Loading…</div>';
+
+  try {
+    const snap = await db.collection('directEntries')
+      .where('farmerPhone', '==', currentFarmer.phone).get();
+
+    const entries = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .filter(d => d.buyerPhone === currentBuyer.phone)
+      .sort((a, b) => {
+        if (b.date !== a.date) return b.date.localeCompare(a.date);
+        const order = { morning: 0, afternoon: 1, evening: 2 };
+        return (order[a.session] || 0) - (order[b.session] || 0);
+      });
+
+    if (!entries.length) {
+      ctn.innerHTML = '<div class="empty-state"><div class="ei">📋</div><p>No direct entries yet.<br>Add the first one above.</p></div>';
+      document.getElementById('farmer-total-liters').textContent = '0 L';
+      document.getElementById('farmer-total-money').textContent  = '₹0';
+      return;
+    }
+
+    const sessionColors = { morning: 'morning', afternoon: 'afternoon', evening: 'evening' };
+    let tL = 0, tM = 0;
+
+    const rows = entries.map(e => {
+      tL += e.liters; tM += e.amount;
+      const sess = e.session || 'morning';
+      const sessIcon = sess === 'morning' ? '🌅' : sess === 'afternoon' ? '☀️' : '🌙';
+      return `<div class="entry-row">
+        <div class="entry-date">
+          ${fmtDate(e.date)}
+          <small><span class="session-badge ${sessionColors[sess]}">${sessIcon} ${sess.charAt(0).toUpperCase()+sess.slice(1)}</span></small>
+        </div>
+        <div class="entry-lit">${e.liters} L</div>
+        <div class="entry-amt">₹${e.amount.toFixed(0)}</div>
+        <button class="entry-del" onclick="deleteDirectEntry('${e.id}')" title="Delete">🗑</button>
+      </div>`;
+    }).join('');
+
+    ctn.innerHTML = '<div class="card" style="padding:8px 12px;">' + rows + '</div>';
+    document.getElementById('farmer-total-liters').textContent = tL.toFixed(1) + ' L';
+    document.getElementById('farmer-total-money').textContent  = '₹' + tM.toFixed(0);
+  } catch(e) {
+    ctn.innerHTML = '<div class="empty-state"><p>Error loading entries.</p></div>';
+  }
+}
+
+async function deleteDirectEntry(id) {
+  if (!confirm('Delete this entry?')) return;
+  try {
+    await db.collection('directEntries').doc(id).delete();
+    toast('Entry deleted', '');
+    loadDirectEntries();
+    loadDFMonthlyPayments();
+    calcBuyerTotals();
+  } catch(e) { toast('Could not delete: ' + e.message, 'error'); }
+}
+
+// ── Direct Farmer Monthly Payments ──
+async function loadDFMonthlyPayments() {
+  if (!currentFarmer || !currentBuyer) return;
+  const ctn = document.getElementById('df-monthly-payment-container');
+  if (!ctn) return;
+  ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:4px 0;">Loading...</div>';
+
+  try {
+    const [entrySnap, paidSnap] = await Promise.all([
+      db.collection('directEntries').where('farmerPhone', '==', currentFarmer.phone).get(),
+      db.collection('dfPayments').where('farmerPhone', '==', currentFarmer.phone).get()
+    ]);
+
+    const myEntries = entrySnap.docs.map(d => d.data())
+      .filter(d => d.buyerPhone === currentBuyer.phone);
+
+    if (!myEntries.length) {
+      ctn.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">No entries yet.</div>'; return;
+    }
+
+    // Group by month
+    const months = {};
+    myEntries.forEach(data => {
+      const ym = (data.date || '').substring(0, 7);
+      if (!ym) return;
+      if (!months[ym]) months[ym] = { liters: 0, amount: 0 };
+      months[ym].liters += (data.liters || 0);
+      months[ym].amount += (data.amount || 0);
+    });
+
+    // Paid map
+    const paidMap = {};
+    paidSnap.docs.forEach(d => {
+      const data = d.data();
+      if (data.buyerPhone === currentBuyer.phone) paidMap[data.month] = d.id;
+    });
+
+    const sortedMonths = Object.keys(months).sort().reverse();
+    ctn.innerHTML = sortedMonths.map(ym => {
+      const isPaid = !!paidMap[ym];
+      const docId  = paidMap[ym] || '';
+      const m      = months[ym];
+      return `<div class="month-row" id="df-row-${ym}">
+        <div class="month-name">${fmtMonth(ym)}</div>
+        <div class="month-stats">${m.liters.toFixed(1)}L · ₹${m.amount.toFixed(0)}</div>
+        <button id="df-btn-paid-${ym}"
+          data-month="${ym}" data-paid="${isPaid}" data-docid="${docId}"
+          class="paid-toggle ${isPaid ? 'mark-unpaid' : 'mark-paid'}"
+          onclick="toggleDFPaid(this)">
+          ${isPaid ? '✅ Paid' : '⏳ Unpaid'}
+        </button>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    ctn.innerHTML = '<div style="color:var(--danger);font-size:13px;">⚠️ Error: ' + e.message + '</div>';
+  }
+}
+
+async function toggleDFPaid(btn) {
+  if (!currentFarmer || !currentBuyer || btn.disabled) return;
+  const month  = btn.dataset.month;
+  const isPaid = btn.dataset.paid === 'true';
+  const docId  = btn.dataset.docid || '';
+
+  btn.disabled = true;
+  if (isPaid) {
+    btn.textContent = '⏳ Unpaid'; btn.className = 'paid-toggle mark-paid';
+    btn.dataset.paid = 'false'; btn.dataset.docid = '';
+  } else {
+    btn.textContent = '✅ Paid'; btn.className = 'paid-toggle mark-unpaid';
+    btn.dataset.paid = 'true';
+  }
+  try {
+    if (isPaid) {
+      if (docId) await db.collection('dfPayments').doc(docId).delete();
+      toast('Marked as Unpaid ⏳', '');
+    } else {
+      const ref = await db.collection('dfPayments').add({
+        farmerPhone: currentFarmer.phone, buyerPhone: currentBuyer.phone,
+        month, paidAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      btn.dataset.docid = ref.id;
+      toast('Marked as Paid ✅', 'success');
+    }
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+    // rollback
+    if (isPaid) { btn.textContent='✅ Paid'; btn.className='paid-toggle mark-unpaid'; btn.dataset.paid='true'; btn.dataset.docid=docId; }
+    else { btn.textContent='⏳ Unpaid'; btn.className='paid-toggle mark-paid'; btn.dataset.paid='false'; }
+  } finally { btn.disabled = false; }
+}
+
 /* ══════════════════════════════════════
    FARMER DETAIL
 ══════════════════════════════════════ */
@@ -2014,11 +2507,25 @@ function openFarmerDetail(phone) {
   currentFarmer = f;
   document.getElementById('farmer-detail-name').textContent = f.name;
   document.getElementById('farmer-detail-price-badge').textContent = (f.village ? '📍' + f.village + '  ' : '') + '₹' + f.pricePerLiter + '/L';
-  document.getElementById('entry-price').value = f.pricePerLiter;
+  document.getElementById('entry-price').value    = f.pricePerLiter;
+  document.getElementById('df-entry-price').value = f.pricePerLiter;
   document.getElementById('entry-liters-select').value = '';
   document.getElementById('entry-liters-custom').style.display = 'none';
   document.getElementById('entry-preview').style.display = 'none';
+  document.getElementById('df-liters-select').value = '';
+  document.getElementById('df-liters-custom').style.display = 'none';
+  document.getElementById('df-entry-preview').style.display = 'none';
   setDateMode('auto');
+  setDateModeDF('auto');
+  // Reset to Middle Man tab
+  currentTab = 'middleman';
+  document.getElementById('tab-middleman').classList.add('active');
+  document.getElementById('tab-directfarmer').classList.remove('active');
+  document.getElementById('panel-middleman').classList.add('active');
+  document.getElementById('panel-directfarmer').classList.remove('active');
+  // Reset sessions
+  setSession('mm', 'morning');
+  setSession('df', 'morning');
   goTo('page-farmer-detail');
   checkNotifPermission();
   loadFarmerEntries();
@@ -2079,6 +2586,7 @@ async function addMilkEntry() {
     await db.collection('milkEntries').add({
       buyerPhone: currentBuyer.phone, farmerPhone: currentFarmer.phone,
       liters, pricePerLiter: price, amount, date,
+      session: mmSession,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     document.getElementById('entry-liters-select').value = '';
